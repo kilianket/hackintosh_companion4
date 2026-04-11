@@ -3,7 +3,7 @@ import 'package:path/path.dart';
 import '../models/device.dart';
 
 class DatabaseHelper {
-  // Singleton-Muster: Es gibt nur eine Instanz der Datenbank
+  // Singleton
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
 
@@ -22,11 +22,17 @@ class DatabaseHelper {
     return await openDatabase(
       path,
       version: 1,
+
+      // 🔥 WICHTIG: Foreign Keys aktivieren
+      onConfigure: (db) async {
+        await db.execute('PRAGMA foreign_keys = ON');
+      },
+
       onCreate: _createDB,
     );
   }
 
-  // Hier wird die Tabelle erstellt
+  // Tabellen erstellen
   Future _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE devices (
@@ -37,25 +43,79 @@ class DatabaseHelper {
         compatible INTEGER NOT NULL
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE kexts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        device_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        version TEXT,
+        FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE issues (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        device_id INTEGER NOT NULL,
+        problem TEXT NOT NULL,
+        loesung TEXT NOT NULL,
+        FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE CASCADE
+      )
+    ''');
   }
 
-  // Gerät speichern
+  // INSERT DEVICE
   Future<int> insertDevice(Device device) async {
-    final db = await instance.database;
+    final db = await database;
     return await db.insert('devices', device.toMap());
   }
 
-  // Alle Geräte laden
+  // GET ALL DEVICES
   Future<List<Device>> getAllDevices() async {
-    final db = await instance.database;
+    final db = await database;
     final result = await db.query('devices');
-
     return result.map((json) => Device.fromMap(json)).toList();
   }
 
-  // Datenbank schließen
+  // GET KEXTS FOR DEVICE
+  Future<List<Map<String, dynamic>>> getKextsForDevice(int deviceId) async {
+    final db = await database;
+    return await db.query(
+      'kexts',
+      where: 'device_id = ?',
+      whereArgs: [deviceId],
+    );
+  }
+
+  // GET ISSUES FOR DEVICE
+  Future<List<Map<String, dynamic>>> getIssuesForDevice(int deviceId) async {
+    final db = await database;
+    return await db.query(
+      'issues',
+      where: 'device_id = ?',
+      whereArgs: [deviceId],
+    );
+  }
+
+  // INSERT KEXT
+  Future<int> insertKext(
+      int deviceId,
+      String name,
+      String version,
+      ) async {
+    final db = await database;
+    return await db.insert('kexts', {
+      'device_id': deviceId,
+      'name': name,
+      'version': version,
+    });
+  }
+
+  // CLOSE DB SAFELY
   Future close() async {
-    final db = await instance.database;
-    db.close();
+    final db = await database;
+    await db.close();
+    _database = null;
   }
 }

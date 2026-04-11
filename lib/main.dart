@@ -11,14 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Hackintosh Companion',
-      debugShowCheckedModeBanner: false, // Entfernt das rote "Debug" Banner
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      // Hier sagen wir Flutter, dass es mit DEINEM HomeScreen starten soll
-      home: const HomeScreen(),
+      theme: ThemeData(brightness: Brightness.dark),
+      // HIER ÄNDERN:
+      home: const BootAnimationScreen(),
     );
   }
 }
