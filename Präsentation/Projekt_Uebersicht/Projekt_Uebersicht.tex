@@ -1,0 +1,259 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\geometry{a4paper, margin=2.5cm}
+
+\title{Projektkonzept: Hackintosh Companion App}
+\author{Kilian Ketelhohn}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Einleitung}
+Im Rahmen des Moduls Mobile Programmierung wird eine Cross-Plattform Anwendung mit Flutter entwickelt. Ziel dieses Projekts ist die Erstellung einer mobilen Datenbank-Anwendung zur Verwaltung und Darstellung von Hackintosh-Konfigurationen.
+
+Die Anwendung soll es ermöglichen, Informationen zu verschiedenen Nicht-Apple-Geräten (z. B. ThinkPads) übersichtlich darzustellen und schnell auf relevante Konfigurationshinweise zuzugreifen.
+
+\section{Projektidee}
+Die Hackintosh Companion App ist eine mobile Anwendung, die als Wissensdatenbank für die Installation von macOS auf nicht unterstützter Hardware dient.
+
+Funktionen:
+\begin{itemize}
+\item Verwaltung von Geräten (z. B. ThinkPad Modelle)
+\item Anzeige benötigter Kext-Treiber
+\item Speicherung von BIOS- und OpenCore-Konfigurationen
+\item Dokumentation von Problemen und Lösungen
+\item Visuelle Darstellung von Hardware-Komponenten
+\end{itemize}
+
+\section{Technologien}
+
+\subsection{Grundtechnologien}
+\begin{itemize}
+\item Flutter (Cross-Plattform Framework)
+\item Dart (Programmiersprache)
+\item SQLite (lokale Datenbank)
+\item Android Studio (Entwicklungsumgebung)
+\end{itemize}
+
+\subsection{Verwendete Libraries}
+\begin{itemize}
+\item sqflite (SQLite Integration)
+\item fl\_chart (Diagramme)
+\item image\_picker (Kamera)
+\item flutter\_3d\_controller (3D Darstellung)
+\item http (REST API Kommunikation)
+\end{itemize}
+
+\section{REST API Integration}
+
+\subsection{Motivation}
+Neben der lokalen SQLite-Datenbank wird eine REST API integriert, um Daten zentral bereitzustellen und zwischen mehreren Nutzern synchronisieren zu können.
+
+Dies ermöglicht eine skalierbare Architektur sowie zukünftige Erweiterungen wie Community-Funktionen und Cloud-Synchronisation.
+
+\subsection{Grundlagen}
+REST (Representational State Transfer) ist ein Architekturstil für Webservices, der über HTTP arbeitet und meist JSON als Datenformat verwendet.
+
+HTTP-Methoden:
+\begin{itemize}
+\item GET: Daten abrufen
+\item POST: Daten erstellen
+\item PUT: Daten aktualisieren
+\item DELETE: Daten löschen
+\end{itemize}
+
+\subsection{Architektur}
+Die Anwendung folgt einem Client-Server-Modell:
+\begin{itemize}
+\item Client: Flutter App
+\item Server: REST API Backend
+\end{itemize}
+
+\subsection{API Endpunkte}
+
+\textbf{Devices:}
+\begin{itemize}
+\item GET /devices
+\item GET /devices/{id}
+\item POST /devices
+\item PUT /devices/{id}
+\item DELETE /devices/{id}
+\end{itemize}
+
+\textbf{Kexts:}
+\begin{itemize}
+\item GET /kexts
+\item POST /kexts
+\end{itemize}
+
+\textbf{Issues:}
+\begin{itemize}
+\item GET /issues
+\item POST /issues
+\end{itemize}
+
+\subsection{JSON Beispiel}
+\begin{verbatim}
+{
+  "id": 1,
+  "name": "ThinkPad T480",
+  "cpu": "Intel i5",
+  "gpu": "Intel UHD 620",
+  "compatible": true
+}
+\end{verbatim}
+
+\subsection{Flutter Integration}
+\begin{verbatim}
+final response = await http.get(
+  Uri.parse('https://api.example.com/devices')
+);
+\end{verbatim}
+
+\subsection{Offline-First Ansatz}
+Die Anwendung kombiniert:
+\begin{itemize}
+\item lokale SQLite-Datenbank (Offline-Nutzung)
+\item REST API (Online-Synchronisation)
+\end{itemize}
+
+\subsection{Synchronisation}
+\begin{itemize}
+\item Daten werden lokal gespeichert
+\item Synchronisation bei bestehender Internetverbindung
+\item Konfliktlösung über Zeitstempel
+\end{itemize}
+
+\subsection{Sicherheit}
+\begin{itemize}
+\item HTTPS
+\item Optional: JWT Authentifizierung
+\end{itemize}
+
+\section{Datenbankdesign}
+
+\subsection{devices}
+\begin{itemize}
+\item id
+\item name
+\item cpu
+\item gpu
+\item macOS kompatibel
+\end{itemize}
+
+\subsection{kexts}
+\begin{itemize}
+\item id
+\item name
+\item version
+\item beschreibung
+\end{itemize}
+
+\subsection{device\_kexts}
+\begin{itemize}
+\item device\_id
+\item kext\_id
+\item notwendig
+\item optional
+\end{itemize}
+
+\subsection{issues}
+\begin{itemize}
+\item device\_id
+\item problem
+\item loesung
+\end{itemize}
+
+\subsection{configs}
+\begin{itemize}
+\item device\_id
+\item bios\_settings
+\item opencore\_version
+\item guide\_link
+\end{itemize}
+
+\section{App-Struktur}
+
+\subsection{Home Screen}
+\begin{itemize}
+\item Geräteübersicht (ListView)
+\item Suchfunktion
+\end{itemize}
+
+\subsection{Detail Screen}
+\begin{itemize}
+\item Geräteinformationen
+\item Kexts
+\item Probleme und Lösungen
+\end{itemize}
+
+\subsection{Visual Screen}
+\begin{itemize}
+\item 3D Modell eines Geräts
+\item Interaktive Hardware-Komponenten
+\end{itemize}
+
+\subsection{Vergleichsansicht}
+Vergleich von zwei Geräten hinsichtlich Kompatibilität und Konfiguration.
+
+\subsection{Export}
+Export von Daten als CSV oder XML.
+
+\section{Animationen und Computergrafik}
+
+\subsection{Boot-Animation}
+Darstellung des Hackintosh Bootprozesses:
+\begin{itemize}
+\item BIOS
+\item OpenCore Bootloader
+\item macOS Start
+\end{itemize}
+
+\subsection{Hardware-Visualisierung}
+\begin{itemize}
+\item Interaktive Darstellung von Komponenten
+\item Visualisierung von Problemen
+\end{itemize}
+
+\subsection{Diagramme}
+\begin{itemize}
+\item Erfolgsraten
+\item Stabilitätsanalysen
+\end{itemize}
+
+\section{Sensorintegration}
+\begin{itemize}
+\item Kamera zur Erfassung von Konfigurationen
+\item QR-Code Scanner
+\end{itemize}
+
+\section{Erweiterungsmöglichkeiten}
+\begin{itemize}
+\item Favoriten
+\item Dark Mode
+\item Community Features
+\item Cloud Synchronisation
+\end{itemize}
+
+\section{Projektziel}
+Ziel ist die Entwicklung einer funktionalen, benutzerfreundlichen und visuell ansprechenden Anwendung mit Fokus auf:
+
+\begin{itemize}
+\item Datenbankintegration
+\item REST Kommunikation
+\item Benutzeroberfläche
+\item Animation und Visualisierung
+\end{itemize}
+
+\section{Fazit}
+Die Anwendung verbindet moderne App-Entwicklung mit Datenbanktechnologien und Computergrafik und stellt eine praxisnahe Lösung für Hackintosh-Nutzer dar.
+
+\end{document}

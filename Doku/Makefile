@@ -1,4 +1,4 @@
-TARGET = Hackintosh_Doku
+TARGET = Hackintosh_Companion_Doku
 LATEX = lualatex
 FLAGS = -synctex=1 -file-line-error -interaction=nonstopmode
 
