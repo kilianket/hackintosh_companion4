@@ -3,74 +3,84 @@ import '../database/database_helper.dart';
 import '../models/device.dart';
 
 class AddDeviceScreen extends StatefulWidget {
+  // Konstruktor mit Key hinzugefügt
+  const AddDeviceScreen({super.key});
+
   @override
-  _AddDeviceScreenState createState() => _AddDeviceScreenState();
+  State<AddDeviceScreen> createState() => _AddDeviceScreenState();
 }
 
 class _AddDeviceScreenState extends State<AddDeviceScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  String name = '';
-  String cpu = '';
-  String gpu = '';
-  bool compatible = false;
+  // Variablen initialisiert
+  String _name = '';
+  String _cpu = '';
+  String _gpu = '';
+  bool _compatible = false;
 
-  void saveDevice() async {
+  void _saveDevice() async {
+    // Validierung prüfen
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
       final device = Device(
-        name: name,
-        cpu: cpu,
-        gpu: gpu,
-        compatible: compatible,
+        name: _name,
+        cpu: _cpu,
+        gpu: _gpu,
+        compatible: _compatible,
       );
 
+      // In Datenbank speichern
       await DatabaseHelper.instance.insertDevice(device);
 
-      Navigator.pop(context, true); // zurück + refresh triggern
+      // WICHTIG: Prüfen, ob der Screen noch "da" ist, bevor Navigator genutzt wird
+      if (!mounted) return;
+      Navigator.pop(context, true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Device')),
+      appBar: AppBar(title: const Text('Add Device')),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0), // const hinzugefügt
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Name'),
-                onSaved: (value) => name = value!,
-                validator: (value) =>
-                value!.isEmpty ? 'Enter name' : null,
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'CPU'),
-                onSaved: (value) => cpu = value!,
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'GPU'),
-                onSaved: (value) => gpu = value!,
-              ),
-              SwitchListTile(
-                title: Text('Compatible'),
-                value: compatible,
-                onChanged: (value) {
-                  setState(() {
-                    compatible = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: saveDevice,
-                child: Text('Save'),
-              )
-            ],
+          child: SingleChildScrollView( // Hinzugefügt, falls die Tastatur das Bild verdeckt
+            child: Column(
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  onSaved: (value) => _name = value ?? '',
+                  validator: (value) =>
+                  (value == null || value.isEmpty) ? 'Enter name' : null,
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'CPU'),
+                  onSaved: (value) => _cpu = value ?? '',
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'GPU'),
+                  onSaved: (value) => _gpu = value ?? '',
+                ),
+                SwitchListTile(
+                  title: const Text('Compatible'),
+                  value: _compatible,
+                  onChanged: (value) {
+                    setState(() {
+                      _compatible = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _saveDevice,
+                  child: const Text('Save Device'),
+                )
+              ],
+            ),
           ),
         ),
       ),
