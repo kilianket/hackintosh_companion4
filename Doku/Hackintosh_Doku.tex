@@ -1,0 +1,123 @@
+\documentclass[bild]{fiwthesis}  %% Bildunterschriften standardmäßig mit "Bild"
+
+%% =====================
+%%  Pakete (Empfehlungen)
+%% =====================
+
+\usepackage{lipsum}               
+\usepackage{siunitx}              
+\usepackage{textgreek}            
+\usepackage{amsmath, amssymb}    
+\usepackage{tabularray}           
+\usepackage{graphicx}             
+\usepackage{subcaption}           
+\usepackage{pgfplots}             
+\usepackage{listings}
+\usepackage{xcolor}
+\usetikzlibrary{positioning, shapes, intersections}  
+
+\pgfplotsset{compat=1.18}
+
+%% ===========
+%%  Metadaten
+%% ===========
+
+% Titel angepasst auf dein Flutter-Projekt
+\thesis{Mobile Applikation: Hackintosh Companion}
+\title{Entwicklung einer mobilen Begleit-Applikation zur datenbankgestützten Verwaltung von Hackintosh-Systemen mit Flutter und SQLite}
+\date{11.04.2026}
+
+\author{Kilian Ketelhohn}{520858}{27.11.2001}{Schwerin}
+\supervisor{Prof.~Dr.~Antje Raab-Düsterhöft}
+\keywords{Flutter, Dart, SQLite, Hackintosh, OpenCore, Mobile Programmierung, 3D-Visualisierung, REST-API}
+
+\makepdfmetadata  
+
+%% ==========
+%%  Präambel
+%% ==========
+
+% Stelle sicher, dass diese Dateien in deinem Projektordner existieren!
+\bibliography{quellen}              
+\input{verzeichnisse/glossar}       
+\input{verzeichnisse/abkuerzungen}  
+\input{verzeichnisse/symbole}        
+
+\makeglossaries{}                   
+\makeindex[
+  intoc=true,
+  title=Index,
+  columns=2
+]{}
+\indexsetup{headers={\indexname}{\indexname}}
+
+%% ===============
+%%  Beginn Thesis
+%% ===============
+
+\begin{document}
+
+%% ============
+%%  Vorspann
+%% ============
+
+\maketitle
+
+% Deine Aufgabenstellung.tex, die wir vorhin generiert haben
+\maketask{\input{kapitel/aufgabenstellung}}  
+
+\maketoc[compact]  
+
+%% ==========
+%%  Textteil
+%% ==========
+
+% Hier binden wir die Kapitel ein, die wir gemeinsam erarbeitet haben:
+\input{kapitel/einleitung}          %% Motivation, Zielsetzung
+\input{kapitel/grundlagen}          %% Hackintosh, Flutter, SQLite vs. MongoDB
+\input{kapitel/methodik}            %% Schichtenarchitektur, Relationales Modell
+\input{kapitel/implementierung}     %% Boot-Animation, 3D, QR-Scanner, SQLite-Code
+\input{kapitel/evaluation}          %% Performance auf Samsung A3, Tests
+\input{kapitel/fazit}               %% Zusammenfassung & Ausblick
+
+%% =========
+%%  Anlagen
+%% =========
+
+\begin{appendices}
+  \input{anlagen/listings}          %% Wichtig: Hier deinen DatabaseHelper-Code rein!
+\end{appendices}
+
+%% ===============
+%%  Verzeichnisse
+%% ===============
+
+\singlespacing  
+
+\listofreferences
+\listoffigures
+\listoftables
+\listoflistings
+\listofacronyms
+\printglossary
+\printindex
+
+\normalspacing  
+
+%% =========================================
+%%  Selbstständigkeitserklärung & Thesen
+%% =========================================
+
+\makedoiw  %% Selbstständigkeitserklärung (HS Wismar Standard)
+
+\maketheses{
+Die Nutzung von Cross-Plattform-Frameworks (Flutter) ermöglicht eine effiziente Bereitstellung technischer Datenbanken für den mobilen Einsatz;
+Ein Offline-First-Ansatz ist essenziell für IT-Begleitwerkzeuge in infrastrukturkritischen Phasen;
+Die Simulation technischer Prozesse (Boot-Animation) steigert die User Experience und das Systemverständnis;
+Relationale Datenbanken (SQLite) gewährleisten die Integrität komplexer Hardware-Treiber-Beziehungen;
+Die Integration von 3D-Grafikkomponenten unterstützt die intuitive Identifikation physischer Hardware-Bauteile;
+QR-Code-gestützter Datenaustausch minimiert manuelle Fehlerquellen bei der Konfigurationsübertragung;
+Die Optimierung für Legacy-Hardware (Samsung A3) belegt die Praxistauglichkeit moderner mobiler Engines.
+}
+
+\end{document}

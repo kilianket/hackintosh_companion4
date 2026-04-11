@@ -1,0 +1,58 @@
+%% kapitel/methodik.tex
+\section{Methodik}
+\label{sec:methodik}
+
+\section{Vorgehensweise}
+Die methodische Entwicklung der \textit{Hackintosh Companion App} folgt einem strukturierten, ingenieurwissenschaftlichen Ansatz für mobile Systeme. Ziel war es, die oft unübersichtlichen und volatilen Hackintosh-Informationen in eine stabile, mobil verfügbare Form zu überführen. 
+
+Die Vorgehensweise gliedert sich in folgende Phasen:
+
+\begin{enumerate}
+    \item \textbf{Anforderungsanalyse und Use-Case-Definition:}  
+    Identifikation der Bedürfnisse von Hackintosh-Usern. Hierbei wurde festgestellt, dass der Zugriff auf BIOS-Settings und Kext-Listen besonders in Phasen kritisch ist, in denen das Zielsystem (z. B. ein ThinkPad) aufgrund von Fehlkonfigurationen nicht über einen Internetzugang verfügt.
+    
+    \item \textbf{Architekturentwurf (Offline-First):}  
+    Methodische Entscheidung für eine hybride Datenhaltung. Die Wahl fiel auf \textbf{SQLite} für die lokale Persistenz und eine \textbf{REST-API} für den globalen Datenaustausch. Dies stellt die Verfügbarkeit der Daten unter Extrembedingungen sicher.
+    
+    \item \textbf{Prototyping und UI/UX-Design:}  
+    Entwicklung eines modernen Dark-Tech-Interfaces in Flutter. Die Methodik sah hierbei vor, komplexe technische Daten durch Animationen (Boot-Sequenz) und interaktive Grafik-Elemente (3D-Modell) intuitiv begreifbar zu machen.
+\end{enumerate}
+
+\section{Konzept des relationalen Datenmodells}
+Im Gegensatz zu einem schema-losen Ansatz wurde hier ein \textbf{relationales Modell} gewählt, um die strikten Abhängigkeiten zwischen Hardwarekomponenten und den dafür notwendigen Treibern (Kexts) technisch abzusichern.
+
+\subsection{Entitäts-Relationship-Modell (ERM)}
+Das Modell ist so normalisiert, dass Redundanzen vermieden und die Datenintegrität gewahrt bleibt.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{l l l}
+\hline
+\textbf{Tabelle} & \textbf{Attribute (Auszug)} & \textbf{Relation} \\
+\hline
+\texttt{devices} & id, name, cpu, gpu, compatible & Parent \\
+\texttt{kexts} & id, device\_id, name, version & 1:n zu devices \\
+\texttt{issues} & id, device\_id, problem, loesung & 1:n zu devices \\
+\texttt{configs} & id, device\_id, bios\_settings, oc\_version & 1:1 zu devices \\
+\hline
+\end{tabular}
+\caption{Struktur des relationalen SQLite-Modells}
+\end{table}
+
+\subsection{Methodische Designentscheidungen}
+\begin{itemize}
+    \item \textbf{Datenintegrität:} Durch den Einsatz von \textit{Foreign Keys} in SQLite wird methodisch verhindert, dass "verwaiste" Treibereinträge entstehen, wenn ein Gerät gelöscht wird (\texttt{ON DELETE CASCADE}).
+    \item \textbf{Effizienz durch Abstraktion:} Die Nutzung von \textbf{Modell-Klassen} in Dart ermöglicht ein automatisiertes Mapping zwischen Datenbank-JSON und UI-Widgets.
+    \item \textbf{Interaktivität:} Die Entscheidung für einen \textbf{QR-Code-Workflow} basiert auf der Methodik, manuelle Eingabefehler bei komplexen Konfigurations-Strings zu eliminieren.
+\end{itemize}
+
+\section{Systemarchitektur und Datenfluss}
+Methodisch wurde eine Schichtenarchitektur (Layered Architecture) implementiert:
+\begin{enumerate}
+    \item \textbf{Presentation Layer:} Flutter Widgets (UI).
+    \item \textbf{Business Logic Layer:} Services für Sync und QR-Verarbeitung.
+    \item \textbf{Data Layer:} SQLite Datenbank und REST-Client.
+\end{enumerate}
+
+\section{Zusammenfassung}
+Die gewählte Methodik kombiniert klassische Datenbank-Prinzipien mit modernen Ansätzen der mobilen App-Entwicklung. Durch die bewusste Entscheidung für ein relationales Modell in Verbindung mit einer Offline-First-Strategie wird eine wissenschaftlich fundierte und zugleich hochgradig praxistaugliche Lösung für die Hackintosh-Community geschaffen.

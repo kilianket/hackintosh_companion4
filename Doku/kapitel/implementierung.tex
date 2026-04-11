@@ -1,0 +1,59 @@
+%% kapitel/implementierung.tex
+\section{Praktische Umsetzung: Implementierung}
+\label{sec:implementierung}
+
+\section{Einleitung}
+In diesem Kapitel wird die technische Realisierung der \textit{Hackintosh Companion App} detailliert beschrieben. Der Fokus liegt auf der Integration der mobilen Benutzeroberfläche mit der lokalen SQLite-Datenbank sowie der Anbindung externer Schnittstellen (REST-API, Sensoren). Es wird aufgezeigt, wie die theoretischen Anforderungen des Konzepts in eine funktionale Android-Applikation überführt wurden.
+
+\section{Workflow der Implementierung}
+Die Entwicklung erfolgte nach einem iterativen Vorgehensmodell in folgenden Phasen:
+
+\begin{enumerate}
+    \item \textbf{Datenbank-Setup:} Implementierung des \texttt{DatabaseHelper}-Singletons zur Steuerung der SQLite-Instanz und Definition des relationalen Schemas (Geräte, Kexts, Issues).
+    \item \textbf{Core-UI \& Navigation:} Aufbau der Grundstruktur mit Flutter (Material Design 3). Implementierung der Hero-Animationen für nahtlose Übergänge zwischen Home- und Detail-Screen.
+    \item \textbf{Grafik-Integration:} Entwicklung der zeitgesteuerten Boot-Sequenz (Simulation von BIOS, OpenCore und macOS-Kernel) und Einbindung des 3D-Controllers für die Hardware-Visualisierung.
+    \item \textbf{Sensorik \& Cloud-Anbindung:} Integration des \texttt{mobile\_scanner}-Pakets für die Kamera-Interaktion sowie des \texttt{http}-Service für den Datenaustausch mit der REST-API.
+    \item \textbf{Optimierung für Legacy-Hardware:} Anpassung des Renderers in der \texttt{AndroidManifest.xml}, um die Stabilität auf älteren Grafik-Chips (Mali-GPUs) zu gewährleisten.
+\end{enumerate}
+
+\section{Integration der Systemkomponenten}
+
+\subsection{Lokale Datenhaltung und Offline-First}
+Die App agiert unabhängig von einer permanenten Internetverbindung. Die Geschäftslogik prüft bei jedem Start den Zustand der lokalen SQLite-Datenbank. Änderungen (z.B. neue Kext-Einträge) werden unmittelbar persistent gespeichert, was die Zuverlässigkeit während eines Hackintosh-Builds sicherstellt.
+
+\subsection{Schnittstellen-Architektur}
+Die Kommunikation zwischen den Komponenten erfolgt streng modular:
+\begin{itemize}
+    \item \textbf{UI zu DB:} Über asynchrone \texttt{Future}-Methoden werden Datenströme direkt in die Widgets (mittels \texttt{ListView.builder}) injiziert.
+    \item \textbf{UI zu Sensoren:} Der QR-Scanner liefert Rohdaten an den \texttt{SyncService}, welcher die Informationen validiert und in Geräte-Modelle parst.
+    \item \textbf{Cloud-Sync:} Der \texttt{SyncService} übernimmt die Konvertierung von Dart-Objekten in JSON-Strings für den API-Upload.
+\end{itemize}
+
+\section{Praktische Umsetzungsschritte}
+Die konkrete Programmierung umfasste unter anderem:
+\begin{itemize}
+    \item Erstellung der relationalen Tabellen mit \texttt{FOREIGN KEY}-Constraints zur Sicherung der Datenintegrität.
+    \item Implementierung eines \textbf{Custom Splash Screens} zur Darstellung des Hackintosh-Bootvorgangs mittels \texttt{StatefulWidgets} und \texttt{Future.delayed}.
+    \item Integration einer \textbf{.glb-Datei} (3D-Laptop-Modell), welche interaktive Rotationen und Komponenten-Fokus ermöglicht.
+    \item Aufbau eines \texttt{ThemeData}-Systems für einen konsistenten Dark-Tech-Look im gesamten Interface.
+\end{itemize}
+
+\section{Besondere Herausforderungen und Lösungen}
+Während der Implementierung traten spezifische Herausforderungen auf:
+
+\begin{itemize}
+    \item \textbf{Grafik-Inkompatibilität:} Abstürze durch den neuen Flutter-Renderer \textit{Impeller} auf älteren Android-Geräten wurden durch ein Fallback auf den \textit{Skia}-Renderer gelöst.
+    \item \textbf{Daten-Synchronisation:} Die Handhabung von asynchronen API-Aufrufen wurde durch robuste \texttt{try-catch}-Blöcke und SnackBar-Feedback für den Nutzer abgesichert.
+    \item \textbf{Animation-Performance:} Um Ruckler auf dem Testgerät (Samsung A3) zu vermeiden, wurden komplexe 3D-Operationen und UI-Updates optimiert.
+\end{itemize}
+
+\section{Testing und Qualitätssicherung}
+Die Qualitätssicherung erfolgte durch:
+\begin{itemize}
+    \item \textbf{Gerätetests:} Kontinuierliches Deployment auf physischer Hardware (Samsung A3, Android 13/Custom ROM), um reale Performance-Werte zu erhalten.
+    \item \textbf{Validierung:} Prüfung der QR-Code-Logik mit verschiedenen Datensätzen (valide JSON vs. korrupte Daten).
+    \item \textbf{UI-Inspektion:} Nutzung des Flutter DevTools-Inspektors zur Optimierung der Widget-Trees und zur Vermeidung von Memory Leaks.
+\end{itemize}
+
+\section{Zusammenfassung}
+Durch die Verzahnung von lokaler Datenbank-Expertise, moderner Cross-Plattform-Entwicklung und der gezielten Nutzung von Hardware-Sensoren wurde ein robustes System geschaffen. Die Trennung von Datenlogik (Service-Layer) und Darstellung (View-Layer) ermöglicht eine einfache Skalierbarkeit für zukünftige Community-Features.

@@ -1,0 +1,59 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+\title{Präsentationsskript: Hackintosh Companion App}
+\author{Kilian Ketelhohn}
+\date{11. April 2026}
+
+\begin{document}
+
+\maketitle
+
+\section*{Folie 1: Titelseite}
+Guten Tag zusammen. Mein Name ist Kilian Ketelhohn und ich freue mich, Ihnen heute mein Projekt vorstellen zu dürfen: Die \textbf{Hackintosh Companion App}. In den nächsten 15 Minuten zeige ich Ihnen, wie ich die Lücke zwischen komplexer Systemkonfiguration und mobiler Nutzbarkeit geschlossen habe.
+
+\section*{Folie 2: Motivation}
+Warum dieses Projekt? Wer schon einmal versucht hat, macOS auf einem ThinkPad zu installieren, weiß: Es ist ein Blindflug. Sobald man im BIOS oder im OpenCore-Picker steckt, hat man oft keinen Internetzugriff auf dem Hauptgerät. 
+\begin{itemize}
+    \item Informationen sind über Foren verstreut.
+    \item Man braucht eine mobile, offline-fähige Datenbank.
+    \item Die App soll das „digitale Schweizer Taschenmesser“ für den Installationsprozess sein.
+\end{itemize}
+
+\section*{Folie 3: Technologie-Stack}
+Bei der Wahl der Technologien standen zwei Anforderungen im Vordergrund: \textbf{Performance} und \textbf{Datenintegrität}.
+\begin{itemize}
+    \item \textbf{Flutter:} Ermöglicht native Performance auf meinem Testgerät, dem Samsung Galaxy A3.
+    \item \textbf{SQLite:} Ein relationales Modell ist hier entscheidend. Warum? Weil wir strikte Abhängigkeiten haben – ein Kext gehört zu einer spezifischen Hardware-ID. SQLite garantiert uns hier über Fremdschlüssel die nötige Konsistenz.
+\end{itemize}
+
+\section*{Folie 4: Kern-Features}
+Hier kommen die technischen Highlights:
+\begin{itemize}
+    \item \textbf{Boot-Simulation:} Das ist mehr als Spielerei. Es dient der UX, um dem Nutzer den Status des Systems zu spiegeln.
+    \item \textbf{3D-Visualisierung:} Über einen integrierten Renderer kann der Nutzer Hardware-Komponenten visuell identifizieren.
+    \item \textbf{QR-Code-Sync:} Anstatt kryptische Konfigurations-Strings abzutippen, nutzen wir die Kamera-Hardware.
+\end{itemize}
+
+\section*{Folie 5: Implementierung (Live-Aspekt)}
+Technisch war die größte Herausforderung die Synchronisation. 
+\textit{(Hier auf den Code auf der Folie deuten)} 
+Ich habe mich für einen \textbf{Offline-First-Ansatz} entschieden. Das bedeutet: Die App arbeitet primär gegen die lokale SQLite-Instanz. Erst wenn ein Netzwerk-Handshake mit der REST-API möglich ist, werden die Daten im Hintergrund abgeglichen. Das sorgt für maximale Ausfallsicherheit.
+
+\section*{Folie 6: Evaluation}
+Theorie ist gut, Praxis ist besser. Die Evaluation auf dem Samsung A3 (Baujahr 2016) hat gezeigt:
+\begin{itemize}
+    \item Datenbankabfragen liegen im Bereich von unter 15 Millisekunden.
+    \item Besonders stolz bin ich auf die Grafik-Performance. Durch den Wechsel vom neuen Impeller-Renderer zurück auf \textbf{Skia} konnte ich stabile 60 FPS beim 3D-Rendering erreichen, was für ein 10 Jahre altes Smartphone beachtlich ist.
+\end{itemize}
+
+\section*{Folie 7: Fazit \& Ausblick}
+Zusammenfassend lässt sich sagen: Die App erfüllt alle Anforderungen eines modernen Begleit-Tools. 
+Für die Zukunft plane ich eine direkte Anbindung an die GitHub-API, um Kext-Updates in Echtzeit zu prüfen. 
+
+Vielen Dank für Ihre Aufmerksamkeit. Ich stehe nun gerne für Ihre Fragen zur Verfügung.
+
+\end{document}

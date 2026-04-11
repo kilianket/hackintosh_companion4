@@ -1,0 +1,22 @@
+%% kapitel/aufgabenstellung.tex
+\section{Aufgabenstellung}
+\label{sec:aufgabenstellung}
+
+Die Installation und der Betrieb von macOS auf nicht offiziell unterstützter Hardware (Hackintosh) stellt Anwender vor erhebliche Herausforderungen. Der Prozess erfordert die präzise Abstimmung von Hardware-IDs, ACPI-Patches, Kernel-Erweiterungen (Kexts) und Bootloader-Konfigurationen. Ein zentrales Problem in der Community ist die mangelnde Mobilität und Strukturierung dieser Informationen: Während der Konfigurationsphase ist das Zielgerät oft nicht einsatzbereit, und wichtige Daten sind über komplexe Web-Guides verteilt.
+
+\section{Ziel der Arbeit}
+Das Ziel dieser Projektarbeit ist die Konzeption und Implementierung der \textbf{Hackintosh Companion App}. Hierbei handelt es sich um eine mobile Cross-Plattform-Anwendung auf Basis von \textbf{Flutter}, die als zentrale Wissensdatenbank und technisches Werkzeug fungiert. Die Anwendung soll den Nutzer dabei unterstützen, gerätespezifische Konfigurationen strukturiert zu erfassen, zu visualisieren und mit einer Community-Datenbank zu synchronisieren.
+
+\section{Konkrete Anforderungen und Teilaufgaben}
+Im Rahmen der Softwareentwicklung sind folgende Teilaufgaben zu lösen:
+
+\begin{itemize}
+    \item \textbf{Datenmodellierung:} Entwurf und Implementierung eines relationalen Datenbankmodells in \textbf{SQLite}, um komplexe Abhängigkeiten zwischen Hardware-Komponenten und den benötigten Treibern abzubilden.
+    \item \textbf{Benutzeroberfläche und Animation:} Entwicklung eines modernen, konsistenten \textbf{Dark-Mode-Designs}. Ein besonderer Fokus liegt auf der Implementierung einer \textbf{Boot-Animation}, die den Startvorgang eines Hackintosh-Systems (BIOS, OpenCore, macOS-Kernel) simuliert, um die Nutzererfahrung zu steigern.
+    \item \textbf{Hardware-Visualisierung:} Integration einer interaktiven \textbf{3D-Grafik-Komponente}, die es dem Nutzer ermöglicht, Hardware-Komponenten am Gerät visuell zu identifizieren und Informationen zu deren Kompatibilität abzurufen.
+    \item \textbf{Konnektivität und Synchronisation:} Implementierung eines \textbf{REST-API-Service} zur Synchronisation lokaler Daten mit einem Server (\textit{Offline-First-Ansatz}) sowie die Einbindung von \textbf{QR-Code-Scanning} zur Erfassung externer Konfigurations-Strings.
+    \item \textbf{Qualitätssicherung:} Sicherstellung der Performance und Stabilität auf physischer Android-Hardware (Samsung A3 2016) unter Berücksichtigung limitierter Systemressourcen.
+\end{itemize}
+
+\section{Methodische Grundlage}
+Als fachliche Referenz für die in der App abgebildeten Logiken dienen die Industriestandards der Hackintosh-Community, insbesondere der \textit{OpenCore Install Guide} von Dortania. Die technische Umsetzung folgt den Best Practices der Flutter-Entwicklung, insbesondere im Bereich der asynchronen Programmierung und des State-Managements.

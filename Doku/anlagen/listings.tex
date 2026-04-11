@@ -1,0 +1,131 @@
+%% ===============================
+%% anlagen/listings.tex
+%% Quellcode-Auszüge: Hackintosh Companion App
+%% ===============================
+
+% ===============================
+% Listings Setup für Dart/Flutter
+% ===============================
+\lstdefinelanguage{Dart}{
+    morekeywords={abstract,as,assert,async,await,break,case,catch,class,const,continue,covariant,default,deferred,do,dynamic,else,enum,export,extends,extension,external,factory,false,final,finally,for,Function,get,hide,if,implements,import,in,interface,is,late,library,mixin,new,null,on,operator,part,rethrow,return,set,show,static,super,switch,sync,this,throw,true,try,typedef,var,void,while,with,yield},
+    sensitive=true,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]',
+    morestring=[b]"
+}
+
+\lstset{
+    language=Dart,
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    frame=single,
+    rulecolor=\color{black!30},
+    backgroundcolor=\color{white!97!gray},
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\color{green!50!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{orange}
+}
+
+% ===============================
+% Datenbank-Logik (SQLite)
+% ===============================
+\section{Datenbank-Implementierung (SQLite)}
+Im folgenden Listing wird die Initialisierung der lokalen Datenbank sowie das relationale Schema mit Fremdschlüssel-Abhängigkeiten dargestellt.
+
+\begin{lstlisting}[language=Dart, caption={DatabaseHelper.dart - Relationales Schema und Initialisierung}]
+// Auszug aus lib/database/database_helper.dart
+Future _createDB(Database db, int version) async {
+  // Haupttabelle fuer Geraete
+  await db.execute('''
+    CREATE TABLE devices (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      cpu TEXT NOT NULL,
+      gpu TEXT NOT NULL,
+      compatible INTEGER NOT NULL
+    )
+  ''');
+
+  // Tabelle fuer Kexts mit Relation zu devices
+  await db.execute('''
+    CREATE TABLE kexts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      device_id INTEGER,
+      name TEXT NOT NULL,
+      version TEXT,
+      FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE CASCADE
+    )
+  ''');
+}
+\end{lstlisting}
+
+% ===============================
+% REST-API Synchronisation
+% ===============================
+\section{REST-API Synchronisation}
+Dieses Listing zeigt die Implementierung des Offline-First-Ansatzes durch den Abgleich lokaler SQLite-Daten mit einem remote JSON-Endpunkt.
+
+\begin{lstlisting}[language=Dart, caption={SyncService.dart - REST-API Anbindung}]
+// Auszug aus lib/services/sync_service.dart
+Future<void> syncUp() async {
+  final localDevices = await DatabaseHelper.instance.getAllDevices();
+  
+  for (var device in localDevices) {
+    try {
+      await http.post(
+        Uri.parse('$baseUrl/devices'),
+        body: json.encode(device.toMap()),
+        headers: {'Content-Type': 'application/json'},
+      );
+    } catch (e) {
+      debugPrint("Upload-Fehler: $e");
+    }
+  }
+}
+\end{lstlisting}
+
+% ===============================
+% 3D-Integration
+% ===============================
+\section{3D-Visualisierung}
+Auszug der Widget-Logik zur Einbindung des interaktiven Laptop-Modells im Detail-Screen.
+
+\begin{lstlisting}[language=Dart, caption={VisualScreen.dart - 3D-Modell Einbindung}]
+// Auszug aus lib/screens/visual_screen.dart
+@override
+Widget build(BuildContext context) {
+  return Flutter3DViewer(
+    controller: controller,
+    src: 'assets/models/thinkpad.glb', // Pfad zum 3D-Asset
+  );
+}
+\end{lstlisting}
+
+% ===============================
+% Boot-Animation
+% ===============================
+\section{Simulation der Boot-Sequenz}
+Implementierung der zeitgesteuerten Phasen (BIOS, OpenCore, macOS) zur Steigerung der User Experience.
+
+\begin{lstlisting}[language=Dart, caption={BootAnimationScreen.dart - Phasensteuerung}]
+// Auszug aus lib/screens/boot_animation_screen.dart
+void _startBootSequence() async {
+  // Phase 1: BIOS Logs
+  await Future.delayed(Duration(milliseconds: 300));
+  setState(() => _bootPhase = 0);
+
+  // Phase 2: OpenCore Picker
+  await Future.delayed(Duration(seconds: 2));
+  setState(() => _bootPhase = 1);
+
+  // Phase 3: macOS Start
+  await Future.delayed(Duration(seconds: 2));
+  setState(() => _bootPhase = 2);
+}
+\end{lstlisting}

@@ -1,0 +1,13 @@
+\frametitle{Offline-First Logik (Auszug)}
+\begin{lstlisting}[language=SQL, basicstyle=\tiny]
+CREATE TABLE devices (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT,
+  cpu TEXT,
+  compatible INTEGER
+);
+\end{lstlisting}
+\begin{itemize}
+    \item \textbf{Single-Source-of-Truth:} Lokale DB steht immer an erster Stelle.
+    \item \textbf{Asynchrone Kommunikation:} API-Sync im Hintergrund.
+\end{itemize}

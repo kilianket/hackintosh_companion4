@@ -1,0 +1,8 @@
+pdflatex Hackintosh_Doku.tex
+
+
+makeglossaries Hackintosh_Doku
+makeindex Hackintosh_Doku
+bibtex Hackintosh_Doku
+makeglossaries Hackintosh_Doku
+makeindex Hackintosh_Doku

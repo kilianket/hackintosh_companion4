@@ -1,0 +1,126 @@
+\documentclass[10pt]{beamer}
+
+% --- Design-Einstellungen ---
+\usetheme{metropolis} % Modernes, cleanes Design
+\usecolortheme{owl}     % Dark-Mode (passend zum Hackintosh-Thema)
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{listings}
+
+% --- Metadaten ---
+\title{Hackintosh Companion App}
+\subtitle{Mobile Begleit-Applikation zur Systemkonfiguration}
+\author{Kilian Ketelhohn}
+\institute{Hochschule Wismar \\ Fachbereich Informatik}
+\date{Verteidigung: 11. April 2026}
+
+\begin{document}
+
+% Titelfolie
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Inhaltsverzeichnis
+\begin{frame}{Agenda}
+    \tableofcontents
+\end{frame}
+
+\section{Problemstellung \& Motivation}
+\begin{frame}{Motivation}
+    \begin{itemize}
+        \item \textbf{Die Herausforderung:} Hackintosh-Konfiguration ist komplex (ACPI, Kexts, OpenCore).
+        \item \textbf{Das Problem:} Dokumentation ist oft nur online verfügbar, während das Zielgerät offline ist.
+        \item \textbf{Die Lösung:} Eine mobile, offline-fähige Wissensdatenbank mit interaktiven Features.
+    \end{itemize}
+\end{frame}
+
+\section{Technologie-Stack}
+\begin{frame}{Entscheidungen & Architektur}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Frontend/Engine:}
+            \begin{itemize}
+                \item Flutter (Cross-Platform)
+                \item Dart (AOT-kompiliert)
+                \item Skia-Renderer (Legacy-Support)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{Datenhaltung:}
+            \begin{itemize}
+                \item SQLite (Lokal)
+                \item REST-API (Cloud-Sync)
+                \item JSON-Mapping
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\section{Kern-Features}
+\begin{frame}{Technische Highlights}
+    \begin{block}{1. Boot-Simulation}
+        Visualisierung des Startvorgangs (BIOS/macOS) zur UX-Steigerung.
+    \end{block}
+    \begin{block}{2. 3D-Hardware-Visualisierung}
+        Interaktives Laptop-Modell zur Komponenten-Identifikation.
+    \end{block}
+    \begin{block}{3. QR-Code-Integration}
+        Fehlerfreie Übertragung von Konfigurations-Strings via Kamera.
+    \end{block}
+\end{frame}
+
+\section{Implementierung}
+\begin{frame}[fragile]{Offline-First Logik (Auszug)}
+\begin{lstlisting}[language=SQL, basicstyle=\tiny]
+CREATE TABLE devices (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT,
+  cpu TEXT,
+  compatible INTEGER
+);
+\end{lstlisting}
+\begin{itemize}
+    \item \textbf{Single-Source-of-Truth:} Lokale DB steht immer an erster Stelle.
+    \item \textbf{Asynchrone Kommunikation:} API-Sync im Hintergrund.
+\end{itemize}
+\end{frame}
+
+\section{Evaluation}
+\begin{frame}{Performance auf Samsung A3 (2016)}
+    \begin{table}
+        \centering
+        \begin{tabular}{lr}
+            \toprule
+            Metrik & Messwert \\
+            \midrule
+            App-Startzeit & $\approx$ 2,5 s \\
+            DB-Abfrage (50 Einträge) & < 15 ms \\
+            3D-Renderer (Skia) & 55--60 FPS \\
+            QR-Erkennung & < 1,5 s \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    \textbf{Ergebnis:} Erfolgreicher Nachweis der Praxistauglichkeit auf Legacy-Hardware.
+\end{frame}
+
+\section{Fazit}
+\begin{frame}{Zusammenfassung \& Ausblick}
+    \begin{itemize}
+        \item \textbf{Erreicht:} Voll funktionsfähiges MVP (Minimum Viable Product).
+        \item \textbf{Lerneffekt:} Tiefer Einblick in Grafik-Pipelines und mobile Daten-Synchronisation.
+        \item \textbf{Ausblick:} GitHub-API Anbindung für automatisierte Kext-Updates.
+    \end{itemize}
+\end{frame}
+
+% Abschlussfolie
+\begin{frame}
+    \centering
+    \Huge Vielen Dank für Ihre Aufmerksamkeit! \\
+    \vspace{1cm}
+    \Large Fragen?
+\end{frame}
+
+\end{document}

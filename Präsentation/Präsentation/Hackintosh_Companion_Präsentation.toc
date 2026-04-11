@@ -1,0 +1,7 @@
+\babel@toc {ngerman}{}\relax 
+\beamer@sectionintoc {1}{Problemstellung \& Motivation}{3}{0}{1}
+\beamer@sectionintoc {2}{Technologie-Stack}{5}{0}{2}
+\beamer@sectionintoc {3}{Kern-Features}{7}{0}{3}
+\beamer@sectionintoc {4}{Implementierung}{9}{0}{4}
+\beamer@sectionintoc {5}{Evaluation}{11}{0}{5}
+\beamer@sectionintoc {6}{Fazit}{13}{0}{6}

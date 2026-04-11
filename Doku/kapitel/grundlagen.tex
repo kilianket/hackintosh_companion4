@@ -1,0 +1,58 @@
+%% kapitel/grundlagen.tex
+\section{Grundlagen}
+\label{sec:grundlagen}
+
+\section{Das Hackintosh-Ökosystem}
+Ein \textit{Hackintosh} bezeichnet ein Computersystem, auf dem das Apple-Betriebssystem macOS auf Hardware ausgeführt wird, die nicht von Apple offiziell autorisiert wurde. Da Apple Hard- und Software als geschlossenes System konzipiert, erfordert der Betrieb auf Standard-PC-Komponenten tiefgreifende Modifikationen an der Schnittstelle zwischen Firmware und Betriebssystem.
+
+\subsection{Technische Säulen: Bootloader und Kexts}
+Damit macOS auf x86-basierter Hardware (wie z.B. Lenovo ThinkPads) startet, sind drei Komponenten essenziell:
+\begin{itemize}
+    \item \textbf{OpenCore Bootloader:} Der moderne Standard-Bootloader. Er emuliert eine Apple-spezifische EFI-Umgebung und injiziert notwendige Daten in den Kernel-Bootprozess.
+    \item \textbf{Kexts (Kernel Extensions):} Da macOS für viele PC-Komponenten (WLAN, Trackpads, Ethernet) keine nativen Treiber besitzt, werden Kernel-Erweiterungen genutzt, um die Hardwarekompatibilität herzustellen.
+    \item \textbf{ACPI-Patches:} Diese korrigieren die herstellerspezifischen Tabellen der Hardware (DSDT/SSDT), damit macOS Funktionen wie das Batteriemanagement oder den Ruhezustand korrekt anspricht.
+\end{itemize}
+
+\section{Framework: Flutter und Dart}
+Die Realisierung der Companion App erfolgt mit dem Framework \textbf{Flutter} von Google.
+\begin{itemize}
+    \item \textbf{Cross-Plattform:} Flutter ermöglicht die Entwicklung aus einer einzigen Codebasis für Android und iOS.
+    \item \textbf{Rendering-Engine:} Anders als native Apps nutzt Flutter eine eigene Engine (Skia/Impeller), was hochperformante Animationen (wie die Boot-Simulation) erlaubt.
+    \item \textbf{Dart:} Die zugrundeliegende Programmiersprache ist objektorientiert und ermöglicht durch \textit{Ahead-of-Time} (AOT) Kompilierung eine native Ausführungsgeschwindigkeit.
+\end{itemize}
+
+\section{Datenhaltung: SQLite und Offline-First}
+Im Gegensatz zu serverbasierten NoSQL-Systemen nutzt dieses Projekt \textbf{SQLite} für die lokale Persistenz.
+
+\subsection{Relationale Datenbank mit SQLite}
+\textbf{SQLite} ist eine dateibasierte, relationale Datenbank. Für die Hackintosh-Verwaltung bietet sie den Vorteil der strukturierten Datenhaltung:
+\begin{itemize}
+    \item \textbf{Struktur:} Feste Tabellen für Geräte, Kexts und Issues gewährleisten Datenintegrität.
+    \item \textbf{Relationen:} Über Fremdschlüssel (\textit{Foreign Keys}) wird sichergestellt, dass Treiber (Kexts) eindeutig einem Hardware-Profil zugeordnet sind.
+\end{itemize}
+
+\subsection{Offline-First-Konzept}
+In der mobilen Programmierung bezeichnet \textit{Offline-First} einen Ansatz, bei dem die App primär mit der lokalen Datenbank arbeitet. Dies ist für Hackintosh-Nutzer kritisch, da während der Systemkonfiguration oft keine stabile Internetverbindung besteht.
+
+\section{Konnektivität: REST-API und JSON}
+Zur Synchronisation der lokalen Daten mit einer zentralen Community-Datenbank wird eine \textbf{REST-API} (Representational State Transfer) eingesetzt.
+\begin{itemize}
+    \item \textbf{HTTP-Methoden:} Die Kommunikation erfolgt über Standard-Methoden wie \texttt{GET} (Abrufen) und \texttt{POST} (Hochladen).
+    \item \textbf{JSON:} Als Austauschformat dient \textit{JavaScript Object Notation}. Es ist leichtgewichtig und lässt sich in Dart effizient in Objekte (\textit{Mapping}) umwandeln.
+\end{itemize}
+
+\section{Motivation und Problemstellung}
+\subsection{Problemstellung}
+Die Konfiguration eines Hackintoshs ist ein iterativer Prozess ("Trial-and-Error"). Informationen über funktionierende Kext-Kombinationen oder BIOS-Einstellungen sind oft über diverse Foren und GitHub-Repositories verstreut. Es fehlt an einer mobilen, zentralisierten Lösung, die diese Daten auch offline am Einsatzort bereitstellt.
+
+\subsection{Zielsetzung der Arbeit}
+Das Ziel ist die Entwicklung der \textbf{Hackintosh Companion App}, die:
+\begin{itemize}
+    \item Eine strukturierte Erfassung von Hardware-Setups ermöglicht.
+    \item Durch \textbf{QR-Code-Scanning} den schnellen Austausch von Konfigurationen erlaubt.
+    \item Mittels \textbf{3D-Visualisierung} die Identifikation von Hardware-Komponenten vereinfacht.
+    \item Eine Brücke zwischen lokaler Speicherung und globalem Cloud-Sync schlägt.
+\end{itemize}
+
+\section{Zusammenfassung für Fachfremde}
+Ein Hackintosh macht macOS auf normalen Laptops nutzbar, was technisch sehr komplex ist. Die hier entwickelte App fungiert als digitales Werkzeugheft. Sie speichert komplizierte Treibereinstellungen lokal ab, visualisiert die Bauteile in 3D und ermöglicht es, fertige Setups einfach per QR-Code mit anderen Nutzern zu teilen – ähnlich wie ein interaktives Handbuch für Systemadministratoren.

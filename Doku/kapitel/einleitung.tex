@@ -1,0 +1,22 @@
+%% kapitel/einleitung.tex
+\chapter{Einleitung}
+\label{chap:einleitung}
+
+\subsection{Motivation}
+Die Installation des Betriebssystems macOS auf Hardware, die nicht von Apple Inc. stammt – ein Prozess, der in der IT-Community als \textit{Hackintoshing} bekannt ist – stellt eine komplexe technische Herausforderung dar. Besonders bei Notebooks, wie den verbreiteten Modellen der Lenovo ThinkPad-Serie, erfordert die Emulation des Apple-spezifischen EFI-Umfelds mittels Bootloadern wie \textbf{OpenCore} eine präzise Abstimmung von Hardware-Informationen, BIOS-Einstellungen und Kernel-Erweiterungen (Kexts).
+
+Häufig müssen Nutzer während der Installation oder bei Systemaktualisierungen schnell auf spezifische Konfigurationsdaten zugreifen, während das Zielgerät selbst nicht einsatzbereit ist. Hier setzt die \textbf{Hackintosh Companion App} an: Sie dient als mobiles Begleitwerkzeug und zentrale Wissensdatenbank, um Konfigurationen geräteunabhängig zu verwalten und Hardware-Spezifikationen interaktiv zu visualisieren.
+
+\subsection{Zielsetzung des Projekts}
+Das primäre Ziel dieser Arbeit ist die Entwicklung einer funktionalen, visuell ansprechenden Cross-Plattform-Anwendung unter Verwendung des \textbf{Flutter-Frameworks}. Die App soll nicht nur als einfache Datenbank fungieren, sondern durch moderne Technologien den Workflow eines Systemadministrators oder Hackintosh-Enthusiasten optimieren. 
+
+Zu den Kernzielen gehören:
+\begin{itemize}
+    \item \textbf{Datenmanagement:} Implementierung einer relationalen Datenbankstruktur mit SQLite zur Speicherung komplexer Hardware-Profile.
+    \item \textbf{Synchronisation:} Gewährleistung der Datenverfügbarkeit durch einen Offline-First-Ansatz und REST-API-Integration.
+    \item \textbf{Benutzererlebnis (UX):} Einsatz von Computergrafiken und 3D-Modellen zur intuitiven Hardware-Identifikation sowie die Simulation technischer Boot-Prozesse durch Animationen.
+    \item \textbf{Sensorintegration:} Nutzung der mobilen Kamera zur Erfassung von Konfigurationsdaten via QR-Code.
+\end{itemize}
+
+\subsection{Struktur der Dokumentation}
+Die vorliegende Dokumentation beschreibt den vollständigen Entwicklungsprozess – von der konzeptionellen Planung über das Datenbankdesign und die Implementierung technischer Highlights bis hin zur Bereitstellung der finalen Android-Applikation.
