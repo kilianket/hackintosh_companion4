@@ -1,13 +1,42 @@
-\frametitle{Offline-First Logik (Auszug)}
-\begin{lstlisting}[language=SQL, basicstyle=\tiny]
+\frametitle{Datenmodell \& Offline-First-Architektur}
+\begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \textbf{Persistenzschicht (SQLite)}
+
+            \begin{lstlisting}[language=SQL, basicstyle=\tiny, frame=single, keywordstyle=\color{blue}]
 CREATE TABLE devices (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT,
-  cpu TEXT,
-  compatible INTEGER
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  cpu_type TEXT,
+  gpu_id TEXT,
+  is_compatible BOOLEAN,
+  last_updated TIMESTAMP
 );
-\end{lstlisting}
-\begin{itemize}
-    \item \textbf{Single-Source-of-Truth:} Lokale DB steht immer an erster Stelle.
-    \item \textbf{Asynchrone Kommunikation:} API-Sync im Hintergrund.
-\end{itemize}
+            \end{lstlisting}
+
+            \vspace{0.2cm}
+
+            \textbf{Architekturprinzip:}
+            \begin{itemize}
+                \item \footnotesize Repository-Pattern als Abstraktionsschicht
+                \item \footnotesize Entkopplung von UI und Datenquelle
+            \end{itemize}
+        \end{column}
+
+        \begin{column}{0.5\textwidth}
+            \textbf{Offline-First-Synchronisation}
+            \begin{itemize}
+                \item \textbf{Single Source of Truth:}
+                Lokale Datenbank als primäre Datenquelle für die UI
+
+                \item \textbf{Asynchrone Synchronisation:}
+                Hintergrundabgleich mit REST-API
+
+                \item \textbf{Konfliktbehandlung:}
+                Timestamp-basierte Priorisierung von Datensätzen
+
+                \item \textbf{Lazy Loading:}
+                Bedarfsgerechtes Nachladen großer Assets (z.\,B. 3D-Modelle)
+            \end{itemize}
+        \end{column}
+    \end{columns}

@@ -23,104 +23,389 @@
     \titlepage
 \end{frame}
 
-% Inhaltsverzeichnis
+% --- Optimierte Gliederung & Einleitung für die Verteidigung ---
+
+% Inhaltsverzeichnis (Präzise & Akademisch)
 \begin{frame}{Agenda}
-    \tableofcontents
+    \begin{enumerate}
+        \item \textbf{Einleitung} (Problemstellung \& Zielsetzung)
+        \item \textbf{Konzeption} (Anforderungen \& Architektur)
+        \item \textbf{Technologie-Stack} (Frameworks \& Datenhaltung)
+        \item \textbf{Implementierung} (Kern-Features \& Herausforderungen)
+        \item \textbf{Evaluation} (Performance-Analyse auf Legacy-Hardware)
+        \item \textbf{Fazit \& Ausblick}
+    \end{enumerate}
 \end{frame}
 
-\section{Problemstellung \& Motivation}
-\begin{frame}{Motivation}
+\section{Einleitung}
+
+\begin{frame}{Problemstellung \& Motivation}
     \begin{itemize}
-        \item \textbf{Die Herausforderung:} Hackintosh-Konfiguration ist komplex (ACPI, Kexts, OpenCore).
-        \item \textbf{Das Problem:} Dokumentation ist oft nur online verfügbar, während das Zielgerät offline ist.
-        \item \textbf{Die Lösung:} Eine mobile, offline-fähige Wissensdatenbank mit interaktiven Features.
+        \item \textbf{Hohe Komplexität:} Hackintosh-Systeme erfordern präzise Abstimmung von ACPI, Kexts und Bootloader-Konfigurationen.
+        
+        \item \textbf{Fragmentierte Informationen:} Relevantes Wissen ist über umfangreiche Online-Guides verteilt (z.\,B. Dortania).
+        
+        \item \textbf{Praktisches Problem:} Während der Installation ist das Zielsystem oft nicht nutzbar $\rightarrow$ kein Zugriff auf Dokumentation.
+        
+        \item \textbf{Konsequenz:} Ineffiziente Fehlersuche und hohe Einstiegshürde für Anwender.
+    \end{itemize}
+
+    \begin{block}{Zielsetzung der Arbeit}
+        Entwicklung einer mobilen \textbf{Companion-App}, die als zentrale, offline-verfügbare Wissens- und Konfigurationsplattform dient.
+    \end{block}
+\end{frame}
+
+
+\begin{frame}{Lösungsansatz}
+    \begin{itemize}
+        \item \textbf{Mobile Wissensdatenbank:} Strukturierte Erfassung von Hardware, Kexts und Konfigurationen
+        
+        \item \textbf{Offline-First:} Zugriff auf alle relevanten Daten ohne Internetverbindung
+        
+        \item \textbf{Interaktive Unterstützung:} Visualisierung und Navigation komplexer Systemabhängigkeiten
+        
+        \item \textbf{Community-Integration:} Synchronisation und Austausch von Konfigurationen über REST-API
+        
+        \item \textbf{Praxisfokus:} Optimiert für reale Nutzungsszenarien auf älterer Hardware
     \end{itemize}
 \end{frame}
 
+
+\begin{frame}{Technische Zielsetzung}
+    \begin{itemize}
+        \item \textbf{Cross-Plattform-Entwicklung:} Umsetzung mit Flutter
+        
+        \item \textbf{Datenmodellierung:} Relationale Struktur in SQLite zur Abbildung komplexer Abhängigkeiten
+        
+        \item \textbf{UI/UX:} Modernes Dark-Mode-Design inkl. simulierter Boot-Sequenz
+        
+        \item \textbf{Hardware-Visualisierung:} Interaktive Darstellung von Komponenten und Kompatibilitäten
+        
+        \item \textbf{Performance-Ziel:} Stabile Ausführung auf ressourcenlimitierter Hardware (z.\,B. Samsung A3 2016)
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Forschungsfrage}
+    \begin{block}{Zentrale Fragestellung}
+        Wie kann eine performante, interaktive und offlinefähige Wissensplattform
+        für komplexe Systemkonfigurationen auf mobiler Hardware realisiert werden?
+    \end{block}
+\end{frame}
+
+% --- Ab hier folgt dein restlicher Tech-Stack-Teil ---
+
 \section{Technologie-Stack}
-\begin{frame}{Entscheidungen & Architektur}
-    \begin{columns}
+
+\begin{frame}{Systemarchitektur \& Technologieauswahl}
+    \begin{columns}[T]
         \begin{column}{0.5\textwidth}
-            \textbf{Frontend/Engine:}
+            \textbf{Frontend \& Applikationslogik}
             \begin{itemize}
-                \item Flutter (Cross-Platform)
-                \item Dart (AOT-kompiliert)
-                \item Skia-Renderer (Legacy-Support)
+                \item \textbf{Flutter (SDK)}
+                \begin{itemize}
+                    \item Deklarative UI für schnelle Entwicklung
+                    \item Native Performance durch AOT-Kompilierung
+                \end{itemize}
+                
+                \item \textbf{Rendering: Skia / Impeller}
+                \begin{itemize}
+                    \item GPU-beschleunigtes Rendering
+                    \item Konsistente Darstellung auf allen Geräten
+                \end{itemize}
+                
+                \item \textbf{Programmiersprache: Dart}
+                \begin{itemize}
+                    \item Asynchrone Verarbeitung (Futures, Streams)
+                    \item Gute Integration in Flutter-Ökosystem
+                \end{itemize}
             \end{itemize}
         \end{column}
+        
         \begin{column}{0.5\textwidth}
-            \textbf{Datenhaltung:}
+            \textbf{Datenhaltung \& Synchronisation}
             \begin{itemize}
-                \item SQLite (Lokal)
-                \item REST-API (Cloud-Sync)
-                \item JSON-Mapping
+                \item \textbf{SQLite (lokal)}
+                \begin{itemize}
+                    \item Relationales Datenmodell
+                    \item Vollständige lokale Persistenz als primäre Datenquelle
+                \end{itemize}
+                
+                \item \textbf{JSON-Serialisierung}
+                \begin{itemize}
+                    \item Mapping zwischen API und lokalem Modell
+                \end{itemize}
+                
+                \item \textbf{REST-API}
+                \begin{itemize}
+                    \item Synchronisation mit Backend
+                    \item Umsetzung eines Offline-First-Ansatzes
+                \end{itemize}
             \end{itemize}
         \end{column}
     \end{columns}
 \end{frame}
 
-\section{Kern-Features}
-\begin{frame}{Technische Highlights}
-    \begin{block}{1. Boot-Simulation}
-        Visualisierung des Startvorgangs (BIOS/macOS) zur UX-Steigerung.
-    \end{block}
-    \begin{block}{2. 3D-Hardware-Visualisierung}
-        Interaktives Laptop-Modell zur Komponenten-Identifikation.
-    \end{block}
-    \begin{block}{3. QR-Code-Integration}
-        Fehlerfreie Übertragung von Konfigurations-Strings via Kamera.
-    \end{block}
-\end{frame}
 
-\section{Implementierung}
-\begin{frame}[fragile]{Offline-First Logik (Auszug)}
-\begin{lstlisting}[language=SQL, basicstyle=\tiny]
-CREATE TABLE devices (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT,
-  cpu TEXT,
-  compatible INTEGER
-);
-\end{lstlisting}
-\begin{itemize}
-    \item \textbf{Single-Source-of-Truth:} Lokale DB steht immer an erster Stelle.
-    \item \textbf{Asynchrone Kommunikation:} API-Sync im Hintergrund.
-\end{itemize}
-\end{frame}
-
-\section{Evaluation}
-\begin{frame}{Performance auf Samsung A3 (2016)}
-    \begin{table}
-        \centering
-        \begin{tabular}{lr}
-            \toprule
-            Metrik & Messwert \\
-            \midrule
-            App-Startzeit & $\approx$ 2,5 s \\
-            DB-Abfrage (50 Einträge) & < 15 ms \\
-            3D-Renderer (Skia) & 55--60 FPS \\
-            QR-Erkennung & < 1,5 s \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
-    \textbf{Ergebnis:} Erfolgreicher Nachweis der Praxistauglichkeit auf Legacy-Hardware.
-\end{frame}
-
-\section{Fazit}
-\begin{frame}{Zusammenfassung \& Ausblick}
+\begin{frame}{Technologieentscheidung: Warum Flutter?}
     \begin{itemize}
-        \item \textbf{Erreicht:} Voll funktionsfähiges MVP (Minimum Viable Product).
-        \item \textbf{Lerneffekt:} Tiefer Einblick in Grafik-Pipelines und mobile Daten-Synchronisation.
-        \item \textbf{Ausblick:} GitHub-API Anbindung für automatisierte Kext-Updates.
+        \item \textbf{Plattformunabhängigkeit:}
+        Eine Codebasis für Android und iOS reduziert Entwicklungs- und Wartungsaufwand erheblich.
+        
+        \item \textbf{Hohe Performance:}
+        Kompilierung in nativen Code ohne Bridge $\rightarrow$ Vorteil gegenüber hybriden Frameworks.
+        
+        \item \textbf{Volle UI-Kontrolle:}
+        Notwendig für spezialisierte Features wie Boot-Simulation und Hardware-Visualisierung.
+        
+        \item \textbf{Offline-First-Unterstützung:}
+        Sehr gute Integration von SQLite und lokalem State Management.
+        
+        \item \textbf{Ökosystem:}
+        Reife Libraries für QR-Code-Scanning, Datenpersistenz und Netzwerkkommunikation.
     \end{itemize}
 \end{frame}
 
-% Abschlussfolie
+\section{Kern-Features}
+
+\begin{frame}{Kern-Features \& Innovationsbeitrag}
+    \begin{itemize}
+        \item \textbf{Interaktive Boot-Simulation}
+        \begin{itemize}
+            \item Visualisierung des OpenCore-Bootprozesses im Verbose-Mode
+            \item Kontextualisierung von Fehlermeldungen in Echtzeit
+            \item $\rightarrow$ Reduktion der kognitiven Belastung bei Debugging-Prozessen
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        
+        \item \textbf{3D-Hardware-Exploration}
+        \begin{itemize}
+            \item Interaktives Gerätemodell zur Identifikation physischer Komponenten
+            \item Verknüpfung von Hardware-IDs mit realen Bauteilen
+            \item $\rightarrow$ Unterstützung bei der gerätespezifischen Konfiguration
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        
+        \item \textbf{QR-basierter Konfigurations-Transfer}
+        \begin{itemize}
+            \item Übertragung komplexer Konfigurationsdaten zwischen Geräten
+            \item Netzwerkunabhängige Schnittstelle zwischen App und Zielsystem
+            \item $\rightarrow$ Eliminierung manueller Eingabefehler
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Deep Dive: QR-Synchronisation}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{block}{Problem}
+                Zielsysteme sind während der Einrichtung häufig ohne Netzwerkzugang $\rightarrow$ klassische Synchronisation nicht möglich
+            \end{block}
+            
+            \begin{block}{Lösungsansatz: „Offline Bridge“}
+                Nutzung optischer Datenübertragung (QR-Codes) als robuste Schnittstelle zwischen mobilen und stationären Systemen
+            \end{block}
+            
+            \textbf{Vorteile:}
+            \begin{itemize}
+                \item \textbf{Zuverlässigkeit:} Validierte Datenübertragung ohne Tippfehler
+                \item \textbf{Unabhängigkeit:} Kein Netzwerk oder Backend erforderlich
+                \item \textbf{Sicherheit:} Keine externe Datenübermittlung notwendig
+            \end{itemize}
+        \end{column}
+        
+        \begin{column}{0.4\textwidth}
+            \centering
+            \textit{[Screenshot: QR-Scan \& Export]}
+            \vfill
+            \small{\textit{Technologie: ML-basierte Echtzeit-Erkennung (z.\,B. Google ML Kit)}}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\section{Implementierung}
+
+\begin{frame}[fragile]{Datenmodell \& Offline-First-Architektur}
+    \begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \textbf{Persistenzschicht (SQLite)}
+            
+            \begin{lstlisting}[language=SQL, basicstyle=\tiny, frame=single, keywordstyle=\color{blue}]
+CREATE TABLE devices (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  cpu_type TEXT,
+  gpu_id TEXT,
+  is_compatible BOOLEAN,
+  last_updated TIMESTAMP
+);
+            \end{lstlisting}
+            
+            \vspace{0.2cm}
+            
+            \textbf{Architekturprinzip:}
+            \begin{itemize}
+                \item \footnotesize Repository-Pattern als Abstraktionsschicht
+                \item \footnotesize Entkopplung von UI und Datenquelle
+            \end{itemize}
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \textbf{Offline-First-Synchronisation}
+            \begin{itemize}
+                \item \textbf{Single Source of Truth:}
+                Lokale Datenbank als primäre Datenquelle für die UI
+                
+                \item \textbf{Asynchrone Synchronisation:}
+                Hintergrundabgleich mit REST-API
+                
+                \item \textbf{Konfliktbehandlung:}
+                Timestamp-basierte Priorisierung von Datensätzen
+                
+                \item \textbf{Lazy Loading:}
+                Bedarfsgerechtes Nachladen großer Assets (z.\,B. 3D-Modelle)
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+\begin{frame}{Nebenläufigkeit \& Performance-Optimierung}
+    \begin{itemize}
+        \item \textbf{Ausgangsproblem:}
+        Blockierende Datenbankabfragen führen zu UI-Lags auf ressourcenlimitierter Hardware
+        
+        \item \textbf{Technischer Ansatz:}
+        Auslagerung rechenintensiver Operationen (SQL, JSON-Parsing) in \textit{Isolates}
+        
+        \item \textbf{Architekturentscheidung:}
+        Konsequente Trennung von UI-Thread und Datenverarbeitung
+        
+        \item \textbf{Ergebnis:}
+        \begin{itemize}
+            \item Flüssige Benutzerinteraktion ohne Frame-Drops
+            \item Stabile Performance auch während Hintergrund-Synchronisation
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{Evaluation}
+
+\begin{frame}{Performance-Evaluation auf Legacy-Hardware}
+    \begin{table}
+        \centering
+        \caption{Benchmark-Ergebnisse auf Samsung Galaxy A3 (2016), Android 7.0}
+        \begin{tabular}{lll}
+            \toprule
+            \textbf{Kategorie} & \textbf{Metrik} & \textbf{Ergebnis} \\
+            \midrule
+            Runtime & Kaltstart-Latenz & $\approx$ 2{,}5 s \\
+            Datenbank & Query-Zeit (50 Datensätze) & < 15 ms \\
+            Rendering & UI-Framerate & 55--60 FPS \\
+            Computer Vision & QR-Dekodierung & < 1{,}5 s \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \begin{itemize}
+        \item \textbf{Leistungsziel erreicht:} Stabile, flüssige Interaktion ($>$ 30 FPS) auf veralteter Hardware
+        
+        \item \textbf{Reaktionsfähigkeit:} Nahezu verzögerungsfreie Datenbankoperationen im Offline-Betrieb
+        
+        \item \textbf{Gesamtbewertung:} Alle Kernfunktionen sind unter realistischen Einsatzbedingungen performant und stabil nutzbar
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Kritische Bewertung \& Limitationen}
+    \begin{itemize}
+        \item \textbf{Speicherverbrauch:}
+        Erhöhter RAM-Bedarf bei 3D-Visualisierung (Peak $\approx$ 180 MB)
+        \begin{itemize}
+            \item Optimierung durch Reduktion von Mesh-Komplexität und Asset-Größe
+        \end{itemize}
+        
+        \item \textbf{Thermische Belastung:}
+        Dauerhafte Kameranutzung (QR-Scanning) führt zu Wärmeentwicklung auf Altgeräten
+        
+        \item \textbf{Trade-off:}
+        Hohe Interaktivität vs. begrenzte Hardware-Ressourcen
+        
+        \item \textbf{Schlussfolgerung:}
+        Das gewählte Technologie-Stack ermöglicht eine performante Umsetzung, erfordert jedoch gezielte Optimierungsstrategien für Low-End-Geräte
+    \end{itemize}
+\end{frame}
+
+\section{Fazit}
+
+\begin{frame}{Fazit: Zielerreichung \& Erkenntnisse}
+    \begin{itemize}
+        \item \textbf{Zielerreichung:}
+        Entwicklung eines funktionsfähigen plattformübergreifenden Prototyps zur Unterstützung der Hackintosh-Konfiguration
+        
+        \item \textbf{Zentraler Beitrag:}
+        Überführung fragmentierter Online-Dokumentation in eine strukturierte, offline-verfügbare Anwendung
+        
+        \item \textbf{Technische Validierung:}
+        \begin{itemize}
+            \item Erfolgreiche Umsetzung eines Offline-First-Ansatzes mit SQLite
+            \item Performante Ausführung trotz limitierter Hardware-Ressourcen
+        \end{itemize}
+        
+        \item \textbf{Erkenntnisgewinn:}
+        Mobile Anwendungen eignen sich zur Unterstützung komplexer Systemkonfigurationen,
+        erfordern jedoch gezielte Optimierung hinsichtlich Performance und Speicher
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Ausblick \& Weiterentwicklung}
+    \begin{block}{Potentielle Erweiterungen}
+        \begin{enumerate}
+            \item \textbf{Automatisierung:}
+            Anbindung an externe Schnittstellen zur automatischen Aktualisierung von Kext- und Systeminformationen
+            
+            \item \textbf{Kollaboration:}
+            Aufbau einer Community-basierten Datenbank für validierte Hardware-Konfigurationen
+            
+            \item \textbf{Intelligente Analyse:}
+            Einsatz von On-Device-Modellen zur kontextsensitiven Auswertung von System-Logs
+        \end{enumerate}
+    \end{block}
+    
+    \vspace{0.4cm}
+    
+    \centering
+    \textbf{Kernfazit:}\\
+    Mobile Companion-Apps stellen einen effektiven Ansatz dar, um die Komplexität technischer Konfigurationsprozesse signifikant zu reduzieren.
+\end{frame}
+
 \begin{frame}
     \centering
-    \Huge Vielen Dank für Ihre Aufmerksamkeit! \\
     \vspace{1cm}
-    \Large Fragen?
+    
+    {\Huge Vielen Dank für Ihre Aufmerksamkeit}
+    
+    \vspace{1cm}
+    
+    {\Large Fragen?}
+    
+    \vspace{1.2cm}
+    
+    \rule{3cm}{3cm} % QR-Code / Repo
+    
+    \vspace{0.3cm}
+    \footnotesize \texttt{https://github.com/kilianket/hackintosh_companion4.git}
+    
+    \vfill
+    
+    \small
+    Kilian Ketelhohn \\
+    Hochschule Wismar -- Fachbereich Informatik \\
+    \texttt{kilian.ketelhohn@stud.hs-wismar.de}
 \end{frame}
 
 \end{document}

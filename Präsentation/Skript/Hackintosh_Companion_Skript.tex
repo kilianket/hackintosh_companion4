@@ -13,47 +13,64 @@
 \maketitle
 
 \section*{Folie 1: Titelseite}
-Guten Tag zusammen. Mein Name ist Kilian Ketelhohn und ich freue mich, Ihnen heute mein Projekt vorstellen zu dürfen: Die \textbf{Hackintosh Companion App}. In den nächsten 15 Minuten zeige ich Ihnen, wie ich die Lücke zwischen komplexer Systemkonfiguration und mobiler Nutzbarkeit geschlossen habe.
+Guten Tag zusammen. Mein Name ist Kilian Ketelhohn und ich freue mich, Ihnen heute mein Projekt vorstellen zu dürfen: die \textbf{Hackintosh Companion App}. In den nächsten 15 Minuten zeige ich Ihnen, wie ich die Lücke zwischen komplexer Systemkonfiguration und mobiler Nutzbarkeit geschlossen habe.
 
 \section*{Folie 2: Motivation}
-Warum dieses Projekt? Wer schon einmal versucht hat, macOS auf einem ThinkPad zu installieren, weiß: Es ist ein Blindflug. Sobald man im BIOS oder im OpenCore-Picker steckt, hat man oft keinen Internetzugriff auf dem Hauptgerät. 
+Warum dieses Projekt? Wer bereits versucht hat, macOS auf einem ThinkPad zu installieren, weiß: Der Prozess ist oft ein Blindflug. Sobald man sich im BIOS oder im OpenCore-Bootloader befindet, fehlt häufig der Zugriff auf eine stabile Internetverbindung am Hauptgerät.
+
 \begin{itemize}
-    \item Informationen sind über Foren verstreut.
-    \item Man braucht eine mobile, offline-fähige Datenbank.
-    \item Die App soll das „digitale Schweizer Taschenmesser“ für den Installationsprozess sein.
+    \item Relevante Informationen sind über zahlreiche Foren verteilt.
+    \item Es besteht der Bedarf an einer mobilen, offline-fähigen Wissensdatenbank.
+    \item Ziel der App ist es, ein digitales Schweizer Taschenmesser für den gesamten Installationsprozess bereitzustellen.
 \end{itemize}
 
 \section*{Folie 3: Technologie-Stack}
-Bei der Wahl der Technologien standen zwei Anforderungen im Vordergrund: \textbf{Performance} und \textbf{Datenintegrität}.
+Bei der Auswahl des Technologie-Stacks standen zwei zentrale Anforderungen im Vordergrund: \textbf{Performance} und \textbf{Datenintegrität}.
+
 \begin{itemize}
-    \item \textbf{Flutter:} Ermöglicht native Performance auf meinem Testgerät, dem Samsung Galaxy A3.
-    \item \textbf{SQLite:} Ein relationales Modell ist hier entscheidend. Warum? Weil wir strikte Abhängigkeiten haben – ein Kext gehört zu einer spezifischen Hardware-ID. SQLite garantiert uns hier über Fremdschlüssel die nötige Konsistenz.
+    \item \textbf{Flutter:} Flutter wurde eingesetzt, um eine plattformübergreifende Anwendung mit nativer Performance zu ermöglichen. Getestet wurde die App auf einem Samsung Galaxy A3, wodurch insbesondere die Performance auf älterer Hardware validiert werden konnte.
+
+    \item \textbf{SQLite:} Für die Datenhaltung kommt SQLite als leichtgewichtige, relationale Datenbank zum Einsatz. Diese Entscheidung ist entscheidend, da im System klare Abhängigkeiten existieren – beispielsweise ist ein \textit{Kext} an bestimmte Hardware-IDs gebunden. Durch den Einsatz relationaler Strukturen und Fremdschlüsselbeziehungen wird die Datenkonsistenz zuverlässig sichergestellt.
 \end{itemize}
 
 \section*{Folie 4: Kern-Features}
-Hier kommen die technischen Highlights:
+In diesem Abschnitt stelle ich die zentralen technischen Funktionen der Anwendung vor, die den praktischen Nutzen der App ausmachen.
+
 \begin{itemize}
-    \item \textbf{Boot-Simulation:} Das ist mehr als Spielerei. Es dient der UX, um dem Nutzer den Status des Systems zu spiegeln.
-    \item \textbf{3D-Visualisierung:} Über einen integrierten Renderer kann der Nutzer Hardware-Komponenten visuell identifizieren.
-    \item \textbf{QR-Code-Sync:} Anstatt kryptische Konfigurations-Strings abzutippen, nutzen wir die Kamera-Hardware.
+    \item \textbf{Boot-Simulation:} Die Boot-Simulation ist bewusst kein rein visuelles Element, sondern dient der User Experience. Sie vermittelt dem Nutzer während kritischer Konfigurationsphasen eine klare Rückmeldung über den Systemstatus und reduziert Unsicherheit im Installationsprozess.
+
+    \item \textbf{3D-Visualisierung:} Ein integrierter 3D-Renderer ermöglicht die visuelle Darstellung von Hardware-Komponenten. Dadurch können Nutzer ihre Systemarchitektur besser verstehen und relevante Komponenten schneller identifizieren.
+
+    \item \textbf{QR-Code-Synchronisation:} Statt komplexe Konfigurationsparameter manuell einzugeben, ermöglicht die App den Austausch über QR-Codes. Die Smartphone-Kamera wird dabei direkt zur Übertragung strukturierter Konfigurationsdaten genutzt, was Fehlerquellen deutlich reduziert.
 \end{itemize}
 
 \section*{Folie 5: Implementierung (Live-Aspekt)}
-Technisch war die größte Herausforderung die Synchronisation. 
-\textit{(Hier auf den Code auf der Folie deuten)} 
-Ich habe mich für einen \textbf{Offline-First-Ansatz} entschieden. Das bedeutet: Die App arbeitet primär gegen die lokale SQLite-Instanz. Erst wenn ein Netzwerk-Handshake mit der REST-API möglich ist, werden die Daten im Hintergrund abgeglichen. Das sorgt für maximale Ausfallsicherheit.
+Eine der zentralen technischen Herausforderungen während der Implementierung war die zuverlässige Synchronisation zwischen lokalen und externen Datenquellen.
+
+\textit{(Hier auf den Code auf der Folie deuten)}
+
+Ich habe mich bewusst für einen \textbf{Offline-First-Ansatz} entschieden. Das bedeutet, dass die App zunächst vollständig gegen die lokale SQLite-Datenbank arbeitet. Dadurch bleibt die Anwendung auch ohne Internetverbindung voll funktionsfähig.
+
+Sobald eine stabile Netzwerkverbindung erkannt wird, erfolgt im Hintergrund ein Abgleich mit der REST-API. Dieser asynchrone Synchronisationsmechanismus stellt sicher, dass lokale Änderungen nicht verloren gehen und das System gleichzeitig mit dem Server konsistent bleibt.
+
+Dieser Ansatz erhöht insbesondere die Ausfallsicherheit und macht die App in realen Installationsszenarien deutlich robuster.
 
 \section*{Folie 6: Evaluation}
-Theorie ist gut, Praxis ist besser. Die Evaluation auf dem Samsung A3 (Baujahr 2016) hat gezeigt:
+Theorie ist nur dann relevant, wenn sie sich in der Praxis bewährt. Daher wurde die Anwendung auf einem Samsung Galaxy A3 (Baujahr 2016) unter realen Bedingungen evaluiert.
+
 \begin{itemize}
-    \item Datenbankabfragen liegen im Bereich von unter 15 Millisekunden.
-    \item Besonders stolz bin ich auf die Grafik-Performance. Durch den Wechsel vom neuen Impeller-Renderer zurück auf \textbf{Skia} konnte ich stabile 60 FPS beim 3D-Rendering erreichen, was für ein 10 Jahre altes Smartphone beachtlich ist.
+    \item Die Performance der Datenbankzugriffe ist sehr hoch: Lokale Abfragen liegen im Durchschnitt im Bereich von unter 15 Millisekunden und sind damit für eine mobile Offline-Anwendung mehr als ausreichend.
+
+    \item Besonders hervorzuheben ist die Grafik-Performance. Durch den gezielten Wechsel vom neuen Impeller-Renderer zurück auf \textbf{Skia} konnte eine stabile Darstellung mit konstant 60 FPS im 3D-Rendering erreicht werden. Gerade auf älterer Hardware ist dies ein entscheidender Faktor für eine flüssige User Experience.
 \end{itemize}
 
 \section*{Folie 7: Fazit \& Ausblick}
-Zusammenfassend lässt sich sagen: Die App erfüllt alle Anforderungen eines modernen Begleit-Tools. 
-Für die Zukunft plane ich eine direkte Anbindung an die GitHub-API, um Kext-Updates in Echtzeit zu prüfen. 
+Zusammenfassend lässt sich sagen, dass die entwickelte Anwendung die definierten Anforderungen an ein modernes Begleit-Tool im Kontext von Hackintosh-Installationen erfüllt.
 
-Vielen Dank für Ihre Aufmerksamkeit. Ich stehe nun gerne für Ihre Fragen zur Verfügung.
+Sie kombiniert eine performante Offline-Architektur mit einer intuitiven Benutzerführung und adressiert damit gezielt die typischen Herausforderungen während des Installations- und Konfigurationsprozesses.
+
+Für die Zukunft ist eine Erweiterung durch eine direkte Anbindung an die GitHub-API geplant. Dadurch sollen insbesondere Kext-Updates automatisiert in Echtzeit überprüft und in die Anwendung integriert werden können.
+
+Vielen Dank für Ihre Aufmerksamkeit. Ich stehe Ihnen nun gerne für Fragen zur Verfügung.
 
 \end{document}

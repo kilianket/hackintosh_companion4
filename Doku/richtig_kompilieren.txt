@@ -1,8 +1,8 @@
-pdflatex Hackintosh_Doku.tex
+pdflatex Hackintosh_Companion_Doku
 
 
-makeglossaries Hackintosh_Doku
-makeindex Hackintosh_Doku
-bibtex Hackintosh_Doku
-makeglossaries Hackintosh_Doku
-makeindex Hackintosh_Doku
+makeglossaries Hackintosh_Companion_Doku
+makeindex Hackintosh_Companion_Doku
+bibtex Hackintosh_Companion_Doku
+makeglossaries Hackintosh_Companion_Doku
+makeindex Hackintosh_Companion_Doku
