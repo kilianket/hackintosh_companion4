@@ -3,7 +3,6 @@ import 'package:path/path.dart';
 import '../models/device.dart';
 
 class DatabaseHelper {
-  // Singleton
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
 
@@ -21,26 +20,31 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 3, // ✅ neue Version wegen compatible
 
-      // 🔥 WICHTIG: Foreign Keys aktivieren
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
 
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
     );
   }
 
-  // Tabellen erstellen
+  // ✅ CREATE DATABASE (NEUINSTALLATION)
   Future _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE devices (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
+        manufacturer TEXT,
         cpu TEXT NOT NULL,
         gpu TEXT NOT NULL,
-        compatible INTEGER NOT NULL
+        wifi TEXT,
+        status TEXT,
+        opencoreVersion TEXT,
+        configPlist TEXT,
+        compatible INTEGER NOT NULL DEFAULT 1
       )
     ''');
 
@@ -65,20 +69,76 @@ class DatabaseHelper {
     ''');
   }
 
-  // INSERT DEVICE
+  // ✅ MIGRATION (BESTEHENDE USER)
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Falls du vorher Version 1 hattest
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS kexts (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          device_id INTEGER NOT NULL,
+          name TEXT NOT NULL,
+          version TEXT,
+          FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE CASCADE
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS issues (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          device_id INTEGER NOT NULL,
+          problem TEXT NOT NULL,
+          loesung TEXT NOT NULL,
+          FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE CASCADE
+        )
+      ''');
+    }
+
+    if (oldVersion < 3) {
+      // 🔥 NEUES FELD compatible hinzufügen
+      await db.execute(
+        'ALTER TABLE devices ADD COLUMN compatible INTEGER NOT NULL DEFAULT 1',
+      );
+    }
+  }
+
+  // =========================
+  // DEVICE
+  // =========================
+
   Future<int> insertDevice(Device device) async {
     final db = await database;
     return await db.insert('devices', device.toMap());
   }
 
-  // GET ALL DEVICES
   Future<List<Device>> getAllDevices() async {
     final db = await database;
     final result = await db.query('devices');
     return result.map((json) => Device.fromMap(json)).toList();
   }
 
-  // GET KEXTS FOR DEVICE
+  Future<int> deleteDevice(int id) async {
+    final db = await database;
+    return await db.delete(
+      'devices',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // =========================
+  // KEXTS
+  // =========================
+
+  Future<int> insertKext(int deviceId, String name, String version) async {
+    final db = await database;
+    return await db.insert('kexts', {
+      'device_id': deviceId,
+      'name': name,
+      'version': version,
+    });
+  }
+
   Future<List<Map<String, dynamic>>> getKextsForDevice(int deviceId) async {
     final db = await database;
     return await db.query(
@@ -88,7 +148,10 @@ class DatabaseHelper {
     );
   }
 
-  // GET ISSUES FOR DEVICE
+  // =========================
+  // ISSUES
+  // =========================
+
   Future<List<Map<String, dynamic>>> getIssuesForDevice(int deviceId) async {
     final db = await database;
     return await db.query(
@@ -98,21 +161,10 @@ class DatabaseHelper {
     );
   }
 
-  // INSERT KEXT
-  Future<int> insertKext(
-      int deviceId,
-      String name,
-      String version,
-      ) async {
-    final db = await database;
-    return await db.insert('kexts', {
-      'device_id': deviceId,
-      'name': name,
-      'version': version,
-    });
-  }
+  // =========================
+  // CLOSE
+  // =========================
 
-  // CLOSE DB SAFELY
   Future close() async {
     final db = await database;
     await db.close();

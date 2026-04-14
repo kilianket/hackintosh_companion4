@@ -1,0 +1,11 @@
+{
+  "name": "ThinkPad T480 Test",
+  "manufacturer": "Lenovo",
+  "cpu": "Intel i7-8650U",
+  "gpu": "Intel UHD 620",
+  "wifi": "Intel Wireless 8265",
+  "status": "active",
+  "opencoreVersion": "1.0.3",
+  "configPlist": "EFI/OC/config.plist",
+  "compatible": true
+}

@@ -9,24 +9,28 @@ class QRScannerScreen extends StatefulWidget {
 }
 
 class _QRScannerScreenState extends State<QRScannerScreen> {
+  bool _handled = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hardware Konfiguration scannen'),
+        title: const Text('Scan Device QR'),
         backgroundColor: const Color(0xFF0F172A),
       ),
       body: MobileScanner(
-        // Die Kamera-Logik
         onDetect: (capture) {
-          final List<Barcode> barcodes = capture.barcodes;
-          for (final barcode in barcodes) {
-            debugPrint('QR Code gefunden: ${barcode.rawValue}');
+          if (_handled) return;
 
-            // Wenn ein Code gefunden wurde, schließen wir den Scanner
-            // und geben den Wert zurück
-            if (barcode.rawValue != null) {
-              Navigator.pop(context, barcode.rawValue);
+          final barcodes = capture.barcodes;
+
+          for (final barcode in barcodes) {
+            final value = barcode.rawValue;
+
+            if (value != null) {
+              _handled = true;
+
+              Navigator.pop(context, value);
               break;
             }
           }

@@ -1,38 +1,55 @@
 class Device {
-  final int? id;         // Die ID wird von der Datenbank automatisch vergeben
+  final int? id;
   final String name;
+  final String manufacturer;
   final String cpu;
   final String gpu;
-  final bool compatible;
+  final String wifi;
+  final String status;
+  final String opencoreVersion;
+  final String configPlist;
+  final bool compatible; // 1. Hier hinzufügen
 
   Device({
     this.id,
     required this.name,
+    required this.manufacturer,
     required this.cpu,
     required this.gpu,
-    required this.compatible,
+    required this.wifi,
+    required this.status,
+    required this.opencoreVersion,
+    required this.configPlist,
+    required this.compatible, // 2. Im Konstruktor ergänzen
   });
 
-  // Wandelt ein Device-Objekt in eine Map um (wichtig für die Datenbank)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
+      'manufacturer': manufacturer,
       'cpu': cpu,
       'gpu': gpu,
-      // SQLite kennt kein echtes "bool", daher speichern wir 1 für true und 0 für false
-      'compatible': compatible ? 1 : 0,
+      'wifi': wifi,
+      'status': status,
+      'opencoreVersion': opencoreVersion,
+      'configPlist': configPlist,
+      'compatible': compatible ? 1 : 0, // In DB meist als 1 oder 0
     };
   }
 
-  // Erstellt ein Device-Objekt aus einer Map (wichtig beim Laden aus der Datenbank)
   factory Device.fromMap(Map<String, dynamic> map) {
     return Device(
       id: map['id'],
       name: map['name'],
+      manufacturer: map['manufacturer'] ?? '',
       cpu: map['cpu'],
       gpu: map['gpu'],
-      compatible: map['compatible'] == 1,
+      wifi: map['wifi'] ?? '',
+      status: map['status'] ?? '',
+      opencoreVersion: map['opencoreVersion'] ?? '',
+      configPlist: map['configPlist'] ?? '',
+      compatible: map['compatible'] == 1 || map['compatible'] == true, // 3. Aus Map lesen
     );
   }
 }

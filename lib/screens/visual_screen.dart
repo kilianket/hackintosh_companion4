@@ -26,15 +26,17 @@ class _VisualScreenState extends State<VisualScreen> {
             child: Text(
               "Untersuche die Hardware-Komponenten für optimale Kompatibilität.",
               style: TextStyle(color: Colors.white70),
-              textAlign: Center,
+              textAlign: TextAlign.center, // ✅ FIX HIER
             ),
           ),
+
           Expanded(
             child: Flutter3DViewer(
               controller: controller,
-              src: 'assets/models/thinkpad.glb', // Pfad zu deinem Modell
+              src: 'assets/models/thinkpad.glb',
             ),
           ),
+
           _buildComponentInfo(),
         ],
       ),
@@ -54,15 +56,23 @@ class _VisualScreenState extends State<VisualScreen> {
             children: [
               Icon(Icons.info_outline, color: Colors.blueAccent),
               SizedBox(width: 10),
-              Text("Fokus: WLAN-Karte (M.2 NGFF)",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text(
+                "Fokus: WLAN-Karte (M.2 NGFF)",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 10),
           Text(
             "Hinweis: Die originale Intel-Karte erfordert 'AirportItlwm.kext'. "
                 "Für volle Continuity-Features wird ein Tausch gegen eine Broadcom-Karte empfohlen.",
-            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+            ),
           ),
         ],
       ),

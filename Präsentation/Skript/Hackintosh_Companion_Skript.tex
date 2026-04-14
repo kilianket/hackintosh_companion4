@@ -13,7 +13,9 @@
 \maketitle
 
 \section*{Folie 1: Titelseite}
-Guten Tag zusammen. Mein Name ist Kilian Ketelhohn und ich freue mich, Ihnen heute mein Projekt vorstellen zu dürfen: die \textbf{Hackintosh Companion App}. In den nächsten 15 Minuten zeige ich Ihnen, wie ich die Lücke zwischen komplexer Systemkonfiguration und mobiler Nutzbarkeit geschlossen habe.
+Guten Tag zusammen. Mein Name ist Kilian Ketelhohn und ich freue mich, Ihnen heute mein Projekt vorstellen zu dürfen: die \textbf{Hackintosh Companion App}. 
+
+In den nächsten 15 Minuten zeige ich Ihnen, wie ich die Lücke zwischen komplexer Systemkonfiguration und mobiler Nutzbarkeit geschlossen habe.
 
 \section*{Folie 2: Motivation}
 Warum dieses Projekt? Wer bereits versucht hat, macOS auf einem ThinkPad zu installieren, weiß: Der Prozess ist oft ein Blindflug. Sobald man sich im BIOS oder im OpenCore-Bootloader befindet, fehlt häufig der Zugriff auf eine stabile Internetverbindung am Hauptgerät.
@@ -30,46 +32,46 @@ Bei der Auswahl des Technologie-Stacks standen zwei zentrale Anforderungen im Vo
 \begin{itemize}
     \item \textbf{Flutter:} Flutter wurde eingesetzt, um eine plattformübergreifende Anwendung mit nativer Performance zu ermöglichen. Getestet wurde die App auf einem Samsung Galaxy A3, wodurch insbesondere die Performance auf älterer Hardware validiert werden konnte.
 
-    \item \textbf{SQLite:} Für die Datenhaltung kommt SQLite als leichtgewichtige, relationale Datenbank zum Einsatz. Diese Entscheidung ist entscheidend, da im System klare Abhängigkeiten existieren – beispielsweise ist ein \textit{Kext} an bestimmte Hardware-IDs gebunden. Durch den Einsatz relationaler Strukturen und Fremdschlüsselbeziehungen wird die Datenkonsistenz zuverlässig sichergestellt.
+    \item \textbf{SQLite:} Für die Datenhaltung kommt SQLite als leichtgewichtige, relationale Datenbank zum Einsatz. Diese Entscheidung ist entscheidend, da im System klare Abhängigkeiten existieren – beispielsweise ist ein \textit{Kext} an bestimmte Hardware-IDs gebunden. Durch relationale Strukturen und Fremdschlüsselbeziehungen wird die Datenkonsistenz zuverlässig sichergestellt.
 \end{itemize}
 
 \section*{Folie 4: Kern-Features}
-In diesem Abschnitt stelle ich die zentralen technischen Funktionen der Anwendung vor, die den praktischen Nutzen der App ausmachen.
+Im Folgenden stelle ich die zentralen Funktionen der Anwendung vor, die den praktischen Mehrwert ausmachen.
 
 \begin{itemize}
-    \item \textbf{Boot-Simulation:} Die Boot-Simulation ist bewusst kein rein visuelles Element, sondern dient der User Experience. Sie vermittelt dem Nutzer während kritischer Konfigurationsphasen eine klare Rückmeldung über den Systemstatus und reduziert Unsicherheit im Installationsprozess.
+    \item \textbf{Boot-Simulation:} Die Boot-Simulation dient gezielt der User Experience. Sie vermittelt während kritischer Konfigurationsphasen eine klare Rückmeldung über den Systemstatus und reduziert Unsicherheiten im Installationsprozess.
 
-    \item \textbf{3D-Visualisierung:} Ein integrierter 3D-Renderer ermöglicht die visuelle Darstellung von Hardware-Komponenten. Dadurch können Nutzer ihre Systemarchitektur besser verstehen und relevante Komponenten schneller identifizieren.
+    \item \textbf{3D-Visualisierung:} Ein integrierter 3D-Renderer ermöglicht die visuelle Darstellung von Hardware-Komponenten. Nutzer können ihre Systemarchitektur dadurch besser nachvollziehen und relevante Komponenten schneller identifizieren.
 
-    \item \textbf{QR-Code-Synchronisation:} Statt komplexe Konfigurationsparameter manuell einzugeben, ermöglicht die App den Austausch über QR-Codes. Die Smartphone-Kamera wird dabei direkt zur Übertragung strukturierter Konfigurationsdaten genutzt, was Fehlerquellen deutlich reduziert.
+    \item \textbf{QR-Code-Synchronisation:} Anstelle der manuellen Eingabe komplexer Konfigurationsparameter erfolgt der Datenaustausch über QR-Codes. Die Smartphone-Kamera wird hierbei zur schnellen und fehlerarmen Übertragung strukturierter Daten genutzt.
 \end{itemize}
 
 \section*{Folie 5: Implementierung (Live-Aspekt)}
-Eine der zentralen technischen Herausforderungen während der Implementierung war die zuverlässige Synchronisation zwischen lokalen und externen Datenquellen.
+Eine der zentralen technischen Herausforderungen war die zuverlässige Synchronisation zwischen lokalen und externen Datenquellen.
 
 \textit{(Hier auf den Code auf der Folie deuten)}
 
-Ich habe mich bewusst für einen \textbf{Offline-First-Ansatz} entschieden. Das bedeutet, dass die App zunächst vollständig gegen die lokale SQLite-Datenbank arbeitet. Dadurch bleibt die Anwendung auch ohne Internetverbindung voll funktionsfähig.
+Ich habe mich bewusst für einen \textbf{Offline-First-Ansatz} entschieden. Das bedeutet, dass die App primär gegen die lokale SQLite-Datenbank arbeitet und somit auch ohne Internetverbindung vollständig funktionsfähig bleibt.
 
-Sobald eine stabile Netzwerkverbindung erkannt wird, erfolgt im Hintergrund ein Abgleich mit der REST-API. Dieser asynchrone Synchronisationsmechanismus stellt sicher, dass lokale Änderungen nicht verloren gehen und das System gleichzeitig mit dem Server konsistent bleibt.
+Sobald eine stabile Netzwerkverbindung erkannt wird, erfolgt im Hintergrund ein Abgleich mit der REST-API. Dieser asynchrone Mechanismus stellt sicher, dass lokale Änderungen erhalten bleiben und gleichzeitig eine Konsistenz mit dem Server gewährleistet wird.
 
-Dieser Ansatz erhöht insbesondere die Ausfallsicherheit und macht die App in realen Installationsszenarien deutlich robuster.
+Dieser Ansatz erhöht die Ausfallsicherheit und macht die Anwendung besonders robust in realen Nutzungsszenarien.
 
 \section*{Folie 6: Evaluation}
 Theorie ist nur dann relevant, wenn sie sich in der Praxis bewährt. Daher wurde die Anwendung auf einem Samsung Galaxy A3 (Baujahr 2016) unter realen Bedingungen evaluiert.
 
 \begin{itemize}
-    \item Die Performance der Datenbankzugriffe ist sehr hoch: Lokale Abfragen liegen im Durchschnitt im Bereich von unter 15 Millisekunden und sind damit für eine mobile Offline-Anwendung mehr als ausreichend.
+    \item Die Datenbankperformance ist sehr hoch: Lokale Abfragen liegen im Durchschnitt bei unter 15 Millisekunden und ermöglichen eine flüssige Nutzung.
 
-    \item Besonders hervorzuheben ist die Grafik-Performance. Durch den gezielten Wechsel vom neuen Impeller-Renderer zurück auf \textbf{Skia} konnte eine stabile Darstellung mit konstant 60 FPS im 3D-Rendering erreicht werden. Gerade auf älterer Hardware ist dies ein entscheidender Faktor für eine flüssige User Experience.
+    \item Besonders hervorzuheben ist die Grafik-Performance. Durch den Wechsel vom Impeller-Renderer zurück auf \textbf{Skia} konnte eine stabile Darstellung mit konstant 60 FPS im 3D-Rendering erreicht werden. Dies ist insbesondere auf älterer Hardware ein entscheidender Faktor für eine gute User Experience.
 \end{itemize}
 
 \section*{Folie 7: Fazit \& Ausblick}
-Zusammenfassend lässt sich sagen, dass die entwickelte Anwendung die definierten Anforderungen an ein modernes Begleit-Tool im Kontext von Hackintosh-Installationen erfüllt.
+Zusammenfassend lässt sich sagen, dass die entwickelte Anwendung die Anforderungen an ein modernes Begleit-Tool im Hackintosh-Kontext erfüllt.
 
-Sie kombiniert eine performante Offline-Architektur mit einer intuitiven Benutzerführung und adressiert damit gezielt die typischen Herausforderungen während des Installations- und Konfigurationsprozesses.
+Sie kombiniert eine performante Offline-Architektur mit einer intuitiven Benutzerführung und adressiert damit gezielt die Herausforderungen während des Installations- und Konfigurationsprozesses.
 
-Für die Zukunft ist eine Erweiterung durch eine direkte Anbindung an die GitHub-API geplant. Dadurch sollen insbesondere Kext-Updates automatisiert in Echtzeit überprüft und in die Anwendung integriert werden können.
+Für die Zukunft ist eine Erweiterung durch eine direkte Anbindung an die GitHub-API geplant, um Kext-Updates automatisiert in Echtzeit prüfen und integrieren zu können.
 
 Vielen Dank für Ihre Aufmerksamkeit. Ich stehe Ihnen nun gerne für Fragen zur Verfügung.
 
