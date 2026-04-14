@@ -47,3 +47,8 @@ app.*.map.json
 *.blend
 *.fbx
 *.glb
+*.synctex*
+*.fdb_latexmk
+*.aux
+*.log
+*.out
