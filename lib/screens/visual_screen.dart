@@ -9,7 +9,7 @@ class VisualScreen extends StatefulWidget {
 }
 
 class _VisualScreenState extends State<VisualScreen> {
-  Flutter3DController controller = Flutter3DController();
+  final Flutter3DController controller = Flutter3DController();
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +17,17 @@ class _VisualScreenState extends State<VisualScreen> {
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
         title: const Text("Hardware Visualisierung"),
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFF0F172A),
+        elevation: 0,
       ),
       body: Column(
         children: [
           const Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16),
             child: Text(
               "Untersuche die Hardware-Komponenten für optimale Kompatibilität.",
               style: TextStyle(color: Colors.white70),
-              textAlign: TextAlign.center, // ✅ FIX HIER
+              textAlign: TextAlign.center,
             ),
           ),
 
@@ -34,10 +35,16 @@ class _VisualScreenState extends State<VisualScreen> {
             child: Flutter3DViewer(
               controller: controller,
               src: 'assets/models/thinkpad.glb',
+              onProgress: (double progress) {
+                debugPrint('Model loading: $progress');
+              },
+              onError: (String error) {
+                debugPrint('Model Error: $error');
+              },
             ),
           ),
 
-          _buildComponentInfo(),
+          _buildComponentInfo(), // Hier wird das Info-Panel wieder eingebunden
         ],
       ),
     );
@@ -50,7 +57,8 @@ class _VisualScreenState extends State<VisualScreen> {
         color: Colors.white.withOpacity(0.05),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
       ),
-      child: Column(
+      child: Column( // 'const' entfernt, da Kinder dynamische Widgets enthalten könnten
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Row(
             children: [
@@ -66,13 +74,9 @@ class _VisualScreenState extends State<VisualScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            "Hinweis: Die originale Intel-Karte erfordert 'AirportItlwm.kext'. "
-                "Für volle Continuity-Features wird ein Tausch gegen eine Broadcom-Karte empfohlen.",
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 13,
-            ),
+          const Text(
+            "Intel-Karten benötigen AirportItlwm.kext. Broadcom bietet bessere macOS-Kompatibilität.",
+            style: TextStyle(color: Colors.white70, fontSize: 13),
           ),
         ],
       ),
