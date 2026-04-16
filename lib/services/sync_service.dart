@@ -1,44 +1,77 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
 import '../database/database_helper.dart';
 import '../models/device.dart';
 
 class SyncService {
-  // Beispiel-URL deiner API
-  static const String baseUrl = 'https://api.deineseite.de';
+  static const String baseUrl = 'http://193.175.119.113:3000';
 
-  // Lädt Daten von der API und speichert sie lokal (Sync-Down)
+  /// =========================
+  /// SYNC DOWN (Cloud → Local)
+  /// =========================
   Future<void> syncDown() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/devices'));
+      final response = await http.get(
+        Uri.parse('$baseUrl/devices'),
+      );
 
-      if (response.statusCode == 200) {
-        List<dynamic> remoteData = json.decode(response.body);
-        for (var item in remoteData) {
-          Device remoteDevice = Device.fromMap(item);
-          // Logik: Lokal speichern, falls noch nicht vorhanden
+      if (response.statusCode != 200) {
+        print("SyncDown Fehler: ${response.statusCode}");
+        return;
+      }
+
+      final List<dynamic> remoteData = jsonDecode(response.body);
+
+      for (final item in remoteData) {
+        final Device remoteDevice = Device.fromMap(item);
+
+        final local = await DatabaseHelper.instance
+            .getDeviceById(remoteDevice.id);
+
+        if (local == null) {
           await DatabaseHelper.instance.insertDevice(remoteDevice);
+        } else {
+          // Konfliktlösung: Cloud gewinnt (einfach & typisch für Demo)
+          await DatabaseHelper.instance.updateDevice(remoteDevice);
         }
       }
     } catch (e) {
-      print("Sync-Fehler: $e");
+      print("SyncDown Fehler: $e");
     }
   }
 
-  // Sendet lokale Geräte an die Cloud (Sync-Up)
+  /// =========================
+  /// SYNC UP (Local → Cloud)
+  /// =========================
   Future<void> syncUp() async {
-    final localDevices = await DatabaseHelper.instance.getAllDevices();
+    try {
+      final localDevices =
+      await DatabaseHelper.instance.getAllDevices();
 
-    for (var device in localDevices) {
-      try {
-        await http.post(
+      for (final device in localDevices) {
+        if (device.isDirty != true) continue;
+
+        final data = device.toMap();
+
+        // JSON Server soll ID selbst verwalten (verhindert Duplikate)
+        data.remove('id');
+
+        final response = await http.post(
           Uri.parse('$baseUrl/devices'),
-          body: json.encode(device.toMap()),
           headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(data),
         );
-      } catch (e) {
-        print("Upload-Fehler für ${device.name}: $e");
+
+        if (response.statusCode == 201 || response.statusCode == 200) {
+          // Gerät ist jetzt synchronisiert
+          await DatabaseHelper.instance.markAsClean(device.id);
+        } else {
+          print("Upload fehlgeschlagen: ${response.statusCode}");
+        }
       }
+    } catch (e) {
+      print("SyncUp Fehler: $e");
     }
   }
 }

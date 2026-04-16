@@ -20,7 +20,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4, // 🔥 erhöht wegen isDirty
 
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
@@ -47,7 +47,8 @@ class DatabaseHelper {
         status TEXT,
         opencoreVersion TEXT,
         configPlist TEXT,
-        compatible INTEGER NOT NULL DEFAULT 1
+        compatible INTEGER NOT NULL DEFAULT 1,
+        isDirty INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -100,20 +101,21 @@ class DatabaseHelper {
     }
 
     if (oldVersion < 3) {
-      // safe alter (verhindert crash wenn Spalte schon existiert)
       try {
         await db.execute(
           'ALTER TABLE devices ADD COLUMN compatible INTEGER NOT NULL DEFAULT 1',
         );
-      } catch (_) {
-        // ignore: column already exists
-      }
+      } catch (_) {}
+    }
+
+    if (oldVersion < 4) {
+      try {
+        await db.execute(
+          'ALTER TABLE devices ADD COLUMN isDirty INTEGER NOT NULL DEFAULT 0',
+        );
+      } catch (_) {}
     }
   }
-
-  // =========================
-  // SAFE TABLE CREATION
-  // =========================
 
   Future<void> _ensureTable(Database db, String tableName, String sql) async {
     final result = await db.rawQuery(
@@ -127,7 +129,7 @@ class DatabaseHelper {
   }
 
   // =========================
-  // DEVICE
+  // DEVICE METHODS
   // =========================
 
   Future<int> insertDevice(Device device) async {
@@ -148,11 +150,54 @@ class DatabaseHelper {
     return result.map((json) => Device.fromMap(json)).toList();
   }
 
+  // 🔥 FIX: fehlende Methode
+  Future<Device?> getDeviceById(int? id) async {
+    if (id == null) return null;
+
+    final db = await database;
+
+    final result = await db.query(
+      'devices',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isEmpty) return null;
+
+    return Device.fromMap(result.first);
+  }
+
+  // 🔥 FIX: fehlende Methode
+  Future<int> updateDevice(Device device) async {
+    final db = await database;
+
+    return await db.update(
+      'devices',
+      device.toMap(),
+      where: 'id = ?',
+      whereArgs: [device.id],
+    );
+  }
+
   Future<int> deleteDevice(int id) async {
     final db = await database;
 
     return await db.delete(
       'devices',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // 🔥 FIX: Sync-Helfer
+  Future<void> markAsClean(int? id) async {
+    if (id == null) return;
+
+    final db = await database;
+
+    await db.update(
+      'devices',
+      {'isDirty': 0},
       where: 'id = ?',
       whereArgs: [id],
     );

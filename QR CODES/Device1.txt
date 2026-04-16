@@ -8,4 +8,93 @@
   "opencoreVersion": "1.0.3",
   "configPlist": "EFI/OC/config.plist",
   "compatible": true
-}
+},
+{
+    "name": "ThinkPad X1 Carbon Gen6",
+    "manufacturer": "Lenovo",
+    "cpu": "Intel i7-8550U",
+    "gpu": "Intel UHD 620",
+    "wifi": "Intel Wireless 8265",
+    "status": "active",
+    "opencoreVersion": "0.9.8",
+    "configPlist": "EFI/OC/config.plist",
+    "compatible": true
+  },
+  {
+    "name": "Dell XPS 13 9370",
+    "manufacturer": "Dell",
+    "cpu": "Intel i7-8650U",
+    "gpu": "Intel UHD 620",
+    "wifi": "Killer 1435 (DW1820A)",
+    "status": "active",
+    "opencoreVersion": "1.0.2",
+    "configPlist": "EFI/OC/config.plist",
+    "compatible": true
+  },
+  {
+    "name": "HP EliteBook 840 G5",
+    "manufacturer": "HP",
+    "cpu": "Intel i5-8250U",
+    "gpu": "Intel UHD 620",
+    "wifi": "Intel Dual Band Wireless-AC 8265",
+    "status": "inactive",
+    "opencoreVersion": "0.9.5",
+    "configPlist": "EFI/OC/config.plist",
+    "compatible": true
+  },
+  {
+    "name": "Asus ZenBook UX430",
+    "manufacturer": "ASUS",
+    "cpu": "Intel i7-8550U",
+    "gpu": "NVIDIA MX150",
+    "wifi": "Intel Wireless 8265",
+    "status": "active",
+    "opencoreVersion": "0.9.9",
+    "configPlist": "EFI/OC/config.plist",
+    "compatible": false
+  },
+  {
+    "name": "Acer Swift 3 SF314",
+    "manufacturer": "Acer",
+    "cpu": "Intel i5-1035G1",
+    "gpu": "Intel UHD G1",
+    "wifi": "Intel AX201",
+    "status": "active",
+    "opencoreVersion": "1.0.3",
+    "configPlist": "EFI/OC/config.plist",
+    "compatible": true
+  },
+  {
+    "name": "MSI Prestige 14",
+    "manufacturer": "MSI",
+    "cpu": "Intel i7-10710U",
+    "gpu": "NVIDIA GTX 1650 Max-Q",
+    "wifi": "Intel AX201",
+    "status": "active",
+    "opencoreVersion": "1.0.1",
+    "configPlist": "EFI/OC/config.plist",
+    "compatible": false
+  },
+  {
+    "name": "ThinkPad T14 Gen1 AMD",
+    "manufacturer": "Lenovo",
+    "cpu": "Ryzen 5 4650U",
+    "gpu": "Radeon Vega",
+    "wifi": "Intel AX200",
+    "status": "testing",
+    "opencoreVersion": "1.0.0",
+    "configPlist": "EFI/OC/config.plist",
+    "compatible": false
+  },
+  {
+    "name": "Dell Latitude 7490",
+    "manufacturer": "Dell",
+    "cpu": "Intel i5-8350U",
+    "gpu": "Intel UHD 620",
+    "wifi": "Intel Wireless 8265",
+    "status": "active",
+    "opencoreVersion": "0.9.7",
+    "configPlist": "EFI/OC/config.plist",
+    "compatible": true
+  }
+

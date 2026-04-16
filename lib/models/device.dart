@@ -10,6 +10,9 @@ class Device {
   final String configPlist;
   final bool compatible;
 
+  /// 🔥 NEU: Sync-Status (wichtig für syncUp)
+  final bool isDirty;
+
   Device({
     this.id,
     required this.name,
@@ -21,6 +24,7 @@ class Device {
     required this.opencoreVersion,
     required this.configPlist,
     required this.compatible,
+    this.isDirty = false,
   });
 
   /// 🔹 Flutter → SQLite
@@ -36,6 +40,9 @@ class Device {
       'opencoreVersion': opencoreVersion,
       'configPlist': configPlist,
       'compatible': compatible ? 1 : 0,
+
+      /// 🔥 NEU
+      'isDirty': isDirty ? 1 : 0,
     };
   }
 
@@ -54,6 +61,9 @@ class Device {
       configPlist: (map['configPlist'] ?? '') as String,
 
       compatible: _parseBool(map['compatible']),
+
+      /// 🔥 NEU
+      isDirty: _parseBool(map['isDirty']),
     );
   }
 
@@ -62,7 +72,9 @@ class Device {
     if (value == null) return false;
     if (value is bool) return value;
     if (value is int) return value == 1;
-    if (value is String) return value == '1' || value.toLowerCase() == 'true';
+    if (value is String) {
+      return value == '1' || value.toLowerCase() == 'true';
+    }
     return false;
   }
 }

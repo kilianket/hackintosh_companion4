@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
 import '../models/device.dart';
+import '../services/sync_service.dart';
 import 'qr_scanner_screen.dart';
 import 'device_detail_screen.dart';
 import 'add_device_screen.dart';
@@ -17,25 +18,64 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Device> _devices = [];
   bool _isLoading = true;
+  bool _isSyncing = false;
 
   @override
   void initState() {
     super.initState();
-    _refreshDevices();
+    _loadDevices();
   }
 
-  Future<void> _refreshDevices() async {
+  // ================= LOAD =================
+
+  Future<void> _loadDevices() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
-    final data = await DatabaseHelper.instance.getAllDevices();
+    try {
+      final data = await DatabaseHelper.instance.getAllDevices();
+
+      if (!mounted) return;
+
+      setState(() {
+        _devices = data;
+      });
+    } catch (e) {
+      _showSnack("Fehler beim Laden: $e");
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  // ================= SYNC =================
+
+  Future<void> _syncData() async {
+    if (_isSyncing) return;
 
     if (!mounted) return;
+    setState(() => _isSyncing = true);
 
-    setState(() {
-      _devices = data;
-      _isLoading = false;
-    });
+    final sync = SyncService();
+
+    try {
+      await sync.syncDown();
+      await sync.syncUp();
+
+      await _loadDevices();
+
+      _showSnack("Synchronisation erfolgreich");
+    } catch (e) {
+      _showSnack("Sync Fehler: $e");
+    } finally {
+      if (mounted) {
+        setState(() => _isSyncing = false);
+      }
+    }
   }
+
+  // ================= QR =================
 
   Future<void> _openQRScanner() async {
     final qrData = await Navigator.push(
@@ -46,7 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted || qrData == null) return;
 
     try {
-      final data = jsonDecode(qrData as String);
+      final Map<String, dynamic> data =
+      jsonDecode(qrData.toString()) as Map<String, dynamic>;
 
       final device = Device(
         name: data['name'] ?? '',
@@ -62,20 +103,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
       await DatabaseHelper.instance.insertDevice(device);
 
-      if (!mounted) return;
+      _showSnack('Device gespeichert');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Device aus QR gespeichert')),
-      );
-
-      await _refreshDevices();
+      await _loadDevices();
     } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('QR Fehler: $e')),
-      );
+      _showSnack('QR Fehler: $e');
     }
+  }
+
+  // ================= UI HELPERS =================
+
+  void _showSnack(String msg) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
   }
 
   void _openDeviceDetail(Device device) {
@@ -86,6 +129,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  // ================= BUILD =================
 
   @override
   Widget build(BuildContext context) {
@@ -98,44 +143,55 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          // ➕ ADD DEVICE
+          // ➕ ADD
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const AddDeviceScreen()),
+                  builder: (_) => const AddDeviceScreen(),
+                ),
               );
 
               if (result == true) {
-                _refreshDevices();
+                _loadDevices();
               }
             },
           ),
 
-          // 📷 QR SCAN
+          // 📷 QR
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: _openQRScanner,
           ),
 
-          // 🔄 REFRESH
+          // 🔄 SYNC
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshDevices,
+            icon: _isSyncing
+                ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+                : const Icon(Icons.sync),
+            onPressed: _isSyncing ? null : _syncData,
           ),
         ],
       ),
 
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _devices.isEmpty
-          ? _buildEmptyState()
-          : ListView.builder(
-        itemCount: _devices.length,
-        itemBuilder: (_, i) =>
-            _buildDeviceCard(_devices[i]),
+      body: RefreshIndicator(
+        onRefresh: _loadDevices,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _devices.isEmpty
+            ? _buildEmptyState()
+            : ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: _devices.length,
+          itemBuilder: (_, i) =>
+              _buildDeviceCard(_devices[i]),
+        ),
       ),
     );
   }
@@ -163,21 +219,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildDeviceCard(Device device) {
     return GestureDetector(
       onTap: () => _openDeviceDetail(device),
-
-      // ❌ DELETE VIA LONG PRESS
       onLongPress: () async {
-        final confirm = await showDialog(
+        final confirm = await showDialog<bool>(
           context: context,
-          builder: (_) => AlertDialog(
+          builder: (dialogContext) => AlertDialog(
             title: const Text("Löschen?"),
             content: const Text("Gerät wirklich löschen?"),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () => Navigator.of(dialogContext).pop(false),
                 child: const Text("Abbrechen"),
               ),
               TextButton(
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () => Navigator.of(dialogContext).pop(true),
                 child: const Text("Löschen"),
               ),
             ],
@@ -186,10 +240,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (confirm == true && device.id != null) {
           await DatabaseHelper.instance.deleteDevice(device.id!);
-          await _refreshDevices();
+          await _loadDevices();
         }
       },
-
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(16),
@@ -201,15 +254,12 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           children: [
             Icon(
-              device.compatible
-                  ? Icons.check_circle
-                  : Icons.cancel,
+              device.compatible ? Icons.check_circle : Icons.cancel,
               color: device.compatible
                   ? Colors.greenAccent
                   : Colors.redAccent,
             ),
             const SizedBox(width: 12),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,12 +282,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            ),
-
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white24,
-              size: 14,
             ),
           ],
         ),

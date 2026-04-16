@@ -1,0 +1,11 @@
+{
+  "devices": [
+    {
+      "id": 1,
+      "name": "ThinkPad T480",
+      "cpu": "Intel i5",
+      "gpu": "Intel UHD 620",
+      "compatible": true
+    }
+  ]
+}
