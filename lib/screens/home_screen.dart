@@ -5,6 +5,7 @@ import '../database/database_helper.dart';
 import '../models/device.dart';
 import 'qr_scanner_screen.dart';
 import 'device_detail_screen.dart';
+import 'add_device_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -92,16 +93,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-
       appBar: AppBar(
         title: const Text("Hackintosh Devices"),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          // ➕ ADD DEVICE
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const AddDeviceScreen()),
+              );
+
+              if (result == true) {
+                _refreshDevices();
+              }
+            },
+          ),
+
+          // 📷 QR SCAN
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: _openQRScanner,
           ),
+
+          // 🔄 REFRESH
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _refreshDevices,
@@ -144,6 +163,33 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildDeviceCard(Device device) {
     return GestureDetector(
       onTap: () => _openDeviceDetail(device),
+
+      // ❌ DELETE VIA LONG PRESS
+      onLongPress: () async {
+        final confirm = await showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Löschen?"),
+            content: const Text("Gerät wirklich löschen?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Abbrechen"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Löschen"),
+              ),
+            ],
+          ),
+        );
+
+        if (confirm == true && device.id != null) {
+          await DatabaseHelper.instance.deleteDevice(device.id!);
+          await _refreshDevices();
+        }
+      },
+
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(16),

@@ -20,7 +20,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3, // ✅ neue Version wegen compatible
+      version: 3,
 
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
@@ -31,8 +31,11 @@ class DatabaseHelper {
     );
   }
 
-  // ✅ CREATE DATABASE (NEUINSTALLATION)
-  Future _createDB(Database db, int version) async {
+  // =========================
+  // CREATE (fresh install)
+  // =========================
+
+  Future<void> _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE devices (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,12 +72,14 @@ class DatabaseHelper {
     ''');
   }
 
-  // ✅ MIGRATION (BESTEHENDE USER)
-  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  // =========================
+  // MIGRATION SAFE
+  // =========================
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Falls du vorher Version 1 hattest
-      await db.execute('''
-        CREATE TABLE IF NOT EXISTS kexts (
+      await _ensureTable(db, 'kexts', '''
+        CREATE TABLE kexts (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           device_id INTEGER NOT NULL,
           name TEXT NOT NULL,
@@ -83,8 +88,8 @@ class DatabaseHelper {
         )
       ''');
 
-      await db.execute('''
-        CREATE TABLE IF NOT EXISTS issues (
+      await _ensureTable(db, 'issues', '''
+        CREATE TABLE issues (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           device_id INTEGER NOT NULL,
           problem TEXT NOT NULL,
@@ -95,10 +100,29 @@ class DatabaseHelper {
     }
 
     if (oldVersion < 3) {
-      // 🔥 NEUES FELD compatible hinzufügen
-      await db.execute(
-        'ALTER TABLE devices ADD COLUMN compatible INTEGER NOT NULL DEFAULT 1',
-      );
+      // safe alter (verhindert crash wenn Spalte schon existiert)
+      try {
+        await db.execute(
+          'ALTER TABLE devices ADD COLUMN compatible INTEGER NOT NULL DEFAULT 1',
+        );
+      } catch (_) {
+        // ignore: column already exists
+      }
+    }
+  }
+
+  // =========================
+  // SAFE TABLE CREATION
+  // =========================
+
+  Future<void> _ensureTable(Database db, String tableName, String sql) async {
+    final result = await db.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+      [tableName],
+    );
+
+    if (result.isEmpty) {
+      await db.execute(sql);
     }
   }
 
@@ -108,17 +132,25 @@ class DatabaseHelper {
 
   Future<int> insertDevice(Device device) async {
     final db = await database;
-    return await db.insert('devices', device.toMap());
+
+    return await db.insert(
+      'devices',
+      device.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<Device>> getAllDevices() async {
     final db = await database;
+
     final result = await db.query('devices');
+
     return result.map((json) => Device.fromMap(json)).toList();
   }
 
   Future<int> deleteDevice(int id) async {
     final db = await database;
+
     return await db.delete(
       'devices',
       where: 'id = ?',
@@ -132,6 +164,7 @@ class DatabaseHelper {
 
   Future<int> insertKext(int deviceId, String name, String version) async {
     final db = await database;
+
     return await db.insert('kexts', {
       'device_id': deviceId,
       'name': name,
@@ -141,6 +174,7 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getKextsForDevice(int deviceId) async {
     final db = await database;
+
     return await db.query(
       'kexts',
       where: 'device_id = ?',
@@ -154,6 +188,7 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getIssuesForDevice(int deviceId) async {
     final db = await database;
+
     return await db.query(
       'issues',
       where: 'device_id = ?',
@@ -165,7 +200,7 @@ class DatabaseHelper {
   // CLOSE
   // =========================
 
-  Future close() async {
+  Future<void> close() async {
     final db = await database;
     await db.close();
     _database = null;

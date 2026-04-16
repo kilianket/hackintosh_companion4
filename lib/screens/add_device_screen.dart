@@ -25,24 +25,21 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
   bool _isLoading = false;
 
   Future<void> _saveDevice() async {
-    debugPrint("Save gedrückt");
+    if (_isLoading) return;
 
-    if (!_formKey.currentState!.validate()) {
-      debugPrint("Form INVALID");
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
 
     final device = Device(
-      name: _name,
-      manufacturer: _manufacturer,
-      cpu: _cpu,
-      gpu: _gpu,
-      wifi: _wifi,
+      name: _name.trim(),
+      manufacturer: _manufacturer.trim(),
+      cpu: _cpu.trim(),
+      gpu: _gpu.trim(),
+      wifi: _wifi.trim(),
       status: _status,
-      opencoreVersion: _opencoreVersion,
-      configPlist: _configPlist,
+      opencoreVersion: _opencoreVersion.trim(),
+      configPlist: _configPlist.trim(),
       compatible: _compatible,
     );
 
@@ -50,22 +47,19 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
 
     try {
       await DatabaseHelper.instance.insertDevice(device);
-      debugPrint("INSERT OK");
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Device gespeichert')),
+        const SnackBar(content: Text('Device erfolgreich gespeichert')),
       );
 
       Navigator.pop(context, true);
     } catch (e) {
-      debugPrint("DB ERROR: $e");
-
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler: $e')),
+        SnackBar(content: Text('Fehler beim Speichern: $e')),
       );
     } finally {
       if (mounted) {
@@ -79,13 +73,23 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
       Function(String?) onSaved, {
         bool required = false,
       }) {
-    return TextFormField(
-      decoration: InputDecoration(labelText: label),
-      onSaved: onSaved,
-      validator: required
-          ? (value) =>
-      (value == null || value.trim().isEmpty) ? 'Enter $label' : null
-          : null,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+        onSaved: onSaved,
+        validator: required
+            ? (value) {
+          if (value == null || value.trim().isEmpty) {
+            return '$label ist erforderlich';
+          }
+          return null;
+        }
+            : null,
+      ),
     );
   }
 
@@ -100,46 +104,89 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                _buildTextField('Name', (v) => _name = v ?? '', required: true),
-                _buildTextField('Manufacturer', (v) => _manufacturer = v ?? ''),
-                _buildTextField('CPU', (v) => _cpu = v ?? '', required: true),
-                _buildTextField('GPU', (v) => _gpu = v ?? '', required: true),
-                _buildTextField('WiFi', (v) => _wifi = v ?? ''),
+                _buildTextField(
+                  'Name',
+                      (v) => _name = v ?? '',
+                  required: true,
+                ),
+                _buildTextField(
+                  'Manufacturer',
+                      (v) => _manufacturer = v ?? '',
+                ),
+                _buildTextField(
+                  'CPU',
+                      (v) => _cpu = v ?? '',
+                  required: true,
+                ),
+                _buildTextField(
+                  'GPU',
+                      (v) => _gpu = v ?? '',
+                  required: true,
+                ),
+                _buildTextField(
+                  'WiFi',
+                      (v) => _wifi = v ?? '',
+                ),
 
                 DropdownButtonFormField<String>(
                   value: _status,
-                  decoration: const InputDecoration(labelText: 'Status'),
-                  items: ['active', 'inactive', 'testing']
-                      .map((s) => DropdownMenuItem(
-                    value: s,
-                    child: Text(s),
-                  ))
-                      .toList(),
-                  onChanged: (value) =>
-                      setState(() => _status = value ?? 'active'),
+                  decoration: const InputDecoration(
+                    labelText: 'Status',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'active', child: Text('active')),
+                    DropdownMenuItem(value: 'inactive', child: Text('inactive')),
+                    DropdownMenuItem(value: 'testing', child: Text('testing')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _status = value ?? 'active';
+                    });
+                  },
                   onSaved: (value) => _status = value ?? 'active',
                 ),
 
+                const SizedBox(height: 12),
+
                 SwitchListTile(
                   title: const Text('Compatible'),
-                  subtitle: const Text('Is this hardware supported?'),
+                  subtitle: const Text('Hardware unterstützt Hackintosh?'),
                   value: _compatible,
-                  onChanged: (value) =>
-                      setState(() => _compatible = value),
+                  onChanged: (value) {
+                    setState(() => _compatible = value);
+                  },
                 ),
 
                 _buildTextField(
-                    'OpenCore Version', (v) => _opencoreVersion = v ?? ''),
+                  'OpenCore Version',
+                      (v) => _opencoreVersion = v ?? '',
+                ),
                 _buildTextField(
-                    'Config.plist Path', (v) => _configPlist = v ?? ''),
+                  'Config.plist Path',
+                      (v) => _configPlist = v ?? '',
+                ),
 
                 const SizedBox(height: 20),
 
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                  onPressed: _saveDevice,
-                  child: const Text('Save Device'),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _saveDevice,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                        : const Text('Save Device'),
+                  ),
                 ),
               ],
             ),

@@ -9,46 +9,67 @@ class DeviceDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const bgColor = Color(0xFF0F172A);
+
     return Scaffold(
+      backgroundColor: bgColor,
       appBar: AppBar(
         title: Text(device.name),
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: bgColor,
+        elevation: 0,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow("CPU", device.cpu),
-            _buildRow("GPU", device.gpu),
-            _buildRow("Manufacturer", device.manufacturer),
-            _buildRow("WiFi", device.wifi),
-            _buildRow("Status", device.status),
-            _buildRow("OpenCore", device.opencoreVersion),
-            _buildRow("Config", device.configPlist),
-
-            const SizedBox(height: 20),
-
-            Row(
+            // 🔹 DEVICE INFO CARD
+            _buildCard(
               children: [
-                Icon(
-                  device.compatible
-                      ? Icons.check_circle
-                      : Icons.cancel,
-                  color: device.compatible
-                      ? Colors.greenAccent
-                      : Colors.redAccent,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  device.compatible ? "Compatible" : "Not Compatible",
-                  style: const TextStyle(color: Colors.white),
+                _buildRow("CPU", device.cpu),
+                _buildRow("GPU", device.gpu),
+                _buildRow("Manufacturer", device.manufacturer),
+                _buildRow("WiFi", device.wifi),
+                _buildRow("Status", device.status),
+                _buildRow("OpenCore", device.opencoreVersion),
+                _buildRow("Config", device.configPlist),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // 🔹 COMPATIBILITY CARD
+            _buildCard(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      device.compatible
+                          ? Icons.check_circle
+                          : Icons.cancel,
+                      color: device.compatible
+                          ? Colors.greenAccent
+                          : Colors.redAccent,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      device.compatible
+                          ? "Compatible"
+                          : "Not Compatible",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 24),
 
+            // 🔹 3D BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -56,7 +77,10 @@ class DeviceDetailScreen extends StatelessWidget {
                 label: const Text("3D Ansicht öffnen"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2563EB),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -74,14 +98,48 @@ class DeviceDetailScreen extends StatelessWidget {
     );
   }
 
+  // ================= UI HELPERS =================
+
+  Widget _buildCard({required List<Widget> children}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
+    );
+  }
+
   Widget _buildRow(String label, String value) {
+    if (value.trim().isEmpty) return const SizedBox();
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        "$label: $value",
-        style: const TextStyle(
-          color: Colors.white70,
-          fontSize: 14,
+      padding: const EdgeInsets.only(bottom: 10),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: "$label: ",
+              style: const TextStyle(
+                color: Colors.white54,
+                fontSize: 13,
+              ),
+            ),
+            TextSpan(
+              text: value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
