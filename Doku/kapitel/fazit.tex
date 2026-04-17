@@ -1,27 +1,31 @@
-%% kapitel/fazit.tex
-\section{Fazit und Ausblick}
+\chapter{Fazit und Ausblick}
 \label{sec:fazit}
 
-Die vorliegende Arbeit demonstriert erfolgreich, wie moderne Cross-Plattform-Frameworks und lokale Datenbanktechnologien genutzt werden können, um komplexe IT-Prozesse wie die Hackintosh-Konfiguration mobil zu unterstützen. Die entwickelte \textit{Hackintosh Companion App} überführt statische und verstreute Informationen in ein interaktives, benutzerzentriertes Werkzeug.
+Die vorliegende Arbeit zeigt, wie moderne Cross-Plattform-Frameworks und lokale Datenbanktechnologien genutzt werden können, um komplexe IT-Prozesse wie die Hackintosh-Konfiguration mobil zu unterstützen. Die entwickelte \textit{Hackintosh Companion App} überführt statische und verstreute Informationen in ein interaktives, benutzerzentriertes Werkzeug.
 
 \section{Zusammenfassung der Ergebnisse}
 Im Rahmen des Projekts wurden folgende Meilensteine erreicht:
 \begin{itemize}
     \item \textbf{Strukturierte Datenhaltung:} Durch den Einsatz von SQLite wurde ein relationales Modell implementiert, das Hardware-Spezifikationen, Treiberabhängigkeiten (Kexts) und Problemlösungen (Issues) konsistent verwaltet.
-    \item \textbf{Innovative Benutzeroberfläche:} Die Integration einer Boot-Animation und eines interaktiven 3D-Laptop-Modells hebt die App von rein textbasierten Datenbankanwendungen ab und steigert die User Experience massiv.
-    \item \textbf{Praxisnahe Konnektivität:} Die Kombination aus Offline-First-Strategie, REST-API-Synchronisation und QR-Code-Scanning stellt sicher, dass die Anwendung unter realen Einsatzbedingungen – etwa bei fehlender Internetverbindung während einer Systeminstallation – zuverlässig funktioniert.
-    \item \textbf{Hardware-Optimierung:} Die erfolgreiche Portierung und Performance-Optimierung auf ein älteres Testgerät (Samsung A3 2016) belegt die Effizienz des Flutter-Frameworks und der gewählten Architektur.
+    
+    \item \textbf{Benutzeroberfläche:} Die Integration einer Boot-Animation sowie eines interaktiven 3D-Laptop-Modells hebt die App von rein textbasierten Anwendungen ab und verbessert die User Experience deutlich.
+    
+    \item \textbf{Konnektivität:} Die Kombination aus Offline-First-Strategie, REST-API-Synchronisation und QR-Code-Scanning stellt sicher, dass die Anwendung auch ohne Internetverbindung – beispielsweise während einer Systeminstallation – zuverlässig funktioniert.
+    
+    \item \textbf{Performance-Optimierung:} Die erfolgreiche Portierung auf ein älteres Testgerät (Samsung A3, 2016) belegt die Effizienz des Flutter-Frameworks sowie der gewählten Architektur.
 \end{itemize}
 
 \section{Persönliches Resümee}
-Die Entwicklung der App bot tiefe Einblicke in die asynchrone Programmierung mit Dart sowie in die Herausforderungen des 3D-Renderings auf mobilen Endgeräten. Besonders die Problematik der Grafik-Renderer (Skia vs. Impeller) verdeutlichte die Notwendigkeit einer engen Verzahnung von Softwareentwicklung und Hardwarekenntnissen.
+Die Entwicklung der Anwendung bot vertiefte Einblicke in die asynchrone Programmierung mit Dart sowie in die Herausforderungen des 3D-Renderings auf mobilen Endgeräten. Insbesondere die Unterschiede zwischen den Grafik-Renderern (Skia und Impeller) verdeutlichten die Bedeutung einer engen Abstimmung zwischen Software und Hardware.
 
 \section{Ausblick}
-Trotz des erreichten Funktionsumfangs bietet die App Potenzial für zukünftige Erweiterungen:
+Trotz des erreichten Funktionsumfangs bietet die Anwendung Potenzial für zukünftige Erweiterungen:
 \begin{itemize}
-    \item \textbf{Automatisierte Kext-Updates:} Eine Anbindung an die GitHub-API könnte Nutzer automatisch informieren, wenn neue Versionen ihrer installierten Treiber verfügbar sind.
-    \item \textbf{Community-Feature:} Implementierung eines Bewertungssystems für Hardware-Konfigurationen, um die Zuverlässigkeit einzelner Setups durch Nutzer-Feedback zu verifizieren.
-    \item \textbf{Erweiterte Sensorik:} Nutzung von Machine Learning (z. B. Google ML Kit), um Hardware-Komponenten direkt über die Kamera per Bilderkennung zu identifizieren, ohne auf QR-Codes angewiesen zu sein.
+    \item \textbf{Automatisierte Kext-Updates:} Eine Anbindung an die GitHub-API könnte Nutzer automatisch über neue Versionen installierter Treiber informieren.
+    
+    \item \textbf{Community-Funktionen:} Die Implementierung eines Bewertungssystems für Hardware-Konfigurationen könnte die Zuverlässigkeit einzelner Setups durch Nutzerfeedback erhöhen.
+    
+    \item \textbf{Erweiterte Sensorik:} Der Einsatz von Machine Learning (z.\,B. Google ML Kit) könnte es ermöglichen, Hardware-Komponenten direkt über die Kamera zu erkennen, ohne auf QR-Codes angewiesen zu sein.
 \end{itemize}
 
-Abschließend lässt sich festhalten, dass die \textit{Hackintosh Companion App} die gestellten Anforderungen nicht nur erfüllt, sondern durch die gewählte technische Tiefe eine solide Grundlage für eine professionelle Community-Plattform darstellt.
+Abschließend lässt sich festhalten, dass die \textit{Hackintosh Companion App} die gestellten Anforderungen erfüllt und durch ihre technische Tiefe eine solide Grundlage für eine zukünftige Community-Plattform bietet.

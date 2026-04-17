@@ -3,9 +3,13 @@
 %% Quellcode-Auszüge: Hackintosh Companion App
 %% ===============================
 
+% WICHTIG:
+% KEIN \chapter hier! Wird in der Hauptdatei definiert.
+
 % ===============================
 % Listings Setup für Dart/Flutter
 % ===============================
+
 \lstdefinelanguage{Dart}{
     morekeywords={abstract,as,assert,async,await,break,case,catch,class,const,continue,covariant,default,deferred,do,dynamic,else,enum,export,extends,extension,external,factory,false,final,finally,for,Function,get,hide,if,implements,import,in,interface,is,late,library,mixin,new,null,on,operator,part,rethrow,return,set,show,static,super,switch,sync,this,throw,true,try,typedef,var,void,while,with,yield},
     sensitive=true,
@@ -38,7 +42,7 @@
 \section{Datenbank-Implementierung (SQLite)}
 Im folgenden Listing wird die Initialisierung der lokalen Datenbank sowie das relationale Schema mit Fremdschlüssel-Abhängigkeiten dargestellt.
 
-\begin{lstlisting}[language=Dart, caption={DatabaseHelper.dart - Relationales Schema und Initialisierung}]
+\begin{lstlisting}[caption={DatabaseHelper.dart – Relationales Schema und Initialisierung}]
 // Auszug aus lib/database/database_helper.dart
 Future _createDB(Database db, int version) async {
   // Haupttabelle fuer Geraete
@@ -68,10 +72,10 @@ Future _createDB(Database db, int version) async {
 % ===============================
 % REST-API Synchronisation
 % ===============================
-\section{REST-API Synchronisation}
-Dieses Listing zeigt die Implementierung des Offline-First-Ansatzes durch den Abgleich lokaler SQLite-Daten mit einem remote JSON-Endpunkt.
+\section{REST-API-Synchronisation}
+Dieses Listing zeigt die Implementierung des Offline-First-Ansatzes durch den Abgleich lokaler SQLite-Daten mit einem entfernten JSON-Endpunkt.
 
-\begin{lstlisting}[language=Dart, caption={SyncService.dart - REST-API Anbindung}]
+\begin{lstlisting}[caption={SyncService.dart – REST-API-Anbindung}]
 // Auszug aus lib/services/sync_service.dart
 Future<void> syncUp() async {
   final localDevices = await DatabaseHelper.instance.getAllDevices();
@@ -96,7 +100,7 @@ Future<void> syncUp() async {
 \section{3D-Visualisierung}
 Auszug der Widget-Logik zur Einbindung des interaktiven Laptop-Modells im Detail-Screen.
 
-\begin{lstlisting}[language=Dart, caption={VisualScreen.dart - 3D-Modell Einbindung}]
+\begin{lstlisting}[caption={VisualScreen.dart – 3D-Modell-Einbindung}]
 // Auszug aus lib/screens/visual_screen.dart
 @override
 Widget build(BuildContext context) {
@@ -113,7 +117,7 @@ Widget build(BuildContext context) {
 \section{Simulation der Boot-Sequenz}
 Implementierung der zeitgesteuerten Phasen (BIOS, OpenCore, macOS) zur Steigerung der User Experience.
 
-\begin{lstlisting}[language=Dart, caption={BootAnimationScreen.dart - Phasensteuerung}]
+\begin{lstlisting}[caption={BootAnimationScreen.dart – Phasensteuerung}]
 // Auszug aus lib/screens/boot_animation_screen.dart
 void _startBootSequence() async {
   // Phase 1: BIOS Logs
