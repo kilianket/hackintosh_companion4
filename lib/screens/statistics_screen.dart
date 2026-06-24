@@ -14,8 +14,7 @@ class StatisticsScreen extends StatefulWidget {
 class _StatisticsScreenState extends State<StatisticsScreen> {
   List<Device> devices = [];
 
-  int checkedIn = 0;
-  int checkedOut = 0;
+  List<double> last5Days = [0, 0, 0, 0, 0];
 
   @override
   void initState() {
@@ -26,13 +25,21 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Future<void> loadData() async {
     final data = await DatabaseHelper.instance.getAllDevices();
 
-    int inCount = data.where((d) => d.checkedIn).length;
-    int outCount = data.length - inCount;
+    final now = DateTime.now();
+
+    List<double> counts = List.filled(5, 0);
+
+    for (final d in data) {
+      final diff = now.difference(d.createdAt).inDays;
+
+      if (diff >= 0 && diff < 5) {
+        counts[4 - diff] += 1;
+      }
+    }
 
     setState(() {
       devices = data;
-      checkedIn = inCount;
-      checkedOut = outCount;
+      last5Days = counts;
     });
   }
 
@@ -41,32 +48,49 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: const Text("Statistiken"),
+        title: const Text("Letzte 5 Tage"),
         backgroundColor: Colors.transparent,
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 20),
 
             SizedBox(
               height: 300,
-              child: PieChart(
-                PieChartData(
-                  sections: [
-                    PieChartSectionData(
-                      value: checkedIn.toDouble(),
-                      title: "$checkedIn",
-                      radius: 100,
-                      color: Colors.green,
+              child: BarChart(
+                BarChartData(
+                  gridData: const FlGridData(show: false),
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, _) {
+                          const labels = ["-4", "-3", "-2", "-1", "Heute"];
+                          return Text(
+                            labels[value.toInt()],
+                            style: const TextStyle(color: Colors.white),
+                          );
+                        },
+                      ),
                     ),
-                    PieChartSectionData(
-                      value: checkedOut.toDouble(),
-                      title: "$checkedOut",
-                      radius: 100,
-                      color: Colors.red,
+                    leftTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: true),
                     ),
-                  ],
+                  ),
+                  barGroups: List.generate(5, (i) {
+                    return BarChartGroupData(
+                      x: i,
+                      barRods: [
+                        BarChartRodData(
+                          toY: last5Days[i],
+                          color: Colors.blueAccent,
+                          width: 20,
+                        )
+                      ],
+                    );
+                  }),
                 ),
               ),
             ),
@@ -74,29 +98,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             const SizedBox(height: 30),
 
             Text(
-              "Eingecheckt: $checkedIn",
-              style: const TextStyle(
-                color: Colors.green,
-                fontSize: 20,
-              ),
-            ),
-
-            Text(
-              "Nicht eingecheckt: $checkedOut",
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 20,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            Text(
-              "Gesamtgeräte: ${devices.length}",
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-              ),
+              "Gesamt Geräte: ${devices.length}",
+              style: const TextStyle(color: Colors.white, fontSize: 18),
             ),
           ],
         ),

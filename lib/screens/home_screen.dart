@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:csv/csv.dart';
-import 'package:path_provider/path_provider.dart';
+
 import 'statistics_screen.dart';
 import '../database/database_helper.dart';
 import '../models/device.dart';
@@ -65,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await sync.syncDown();
       await sync.syncUp();
-
       await _loadDevices();
 
       _showSnack("Synchronisation erfolgreich");
@@ -102,36 +101,21 @@ class _HomeScreenState extends State<HomeScreen> {
         opencoreVersion: data['opencoreVersion'] ?? '',
         configPlist: data['configPlist'] ?? '',
         compatible: data['compatible'] ?? true,
+        checkedIn: true,
+        isDirty: true,
+        createdAt: DateTime.now(), // ✅ FIX für Statistik
       );
 
       await DatabaseHelper.instance.insertDevice(device);
 
       _showSnack('Device gespeichert');
-
       await _loadDevices();
     } catch (e) {
       _showSnack('QR Fehler: $e');
     }
   }
 
-  // ================= UI HELPERS =================
-
-  void _showSnack(String msg) {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
-    );
-  }
-
-  void _openDeviceDetail(Device device) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => DeviceDetailScreen(device: device),
-      ),
-    );
-  }
+  // ================= CSV EXPORT =================
 
   Future<void> _exportCsv() async {
     try {
@@ -154,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
           "OpenCore Version",
           "ConfigPlist",
           "Kompatibel",
+          "CreatedAt"
         ]
       ];
 
@@ -169,26 +154,42 @@ class _HomeScreenState extends State<HomeScreen> {
           d.opencoreVersion,
           d.configPlist,
           d.compatible ? "Ja" : "Nein",
+          d.createdAt.toIso8601String(),
         ]);
       }
 
       final csvData = const ListToCsvConverter().convert(rows);
 
       final now = DateTime.now();
-
       final filename =
           "hackintosh_export_${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}.csv";
 
-      final directory = await getApplicationDocumentsDirectory();
-
-      final file = File("${directory.path}/$filename");
+      final file = File("/storage/emulated/0/Download/$filename");
 
       await file.writeAsString(csvData);
 
-      _showSnack("CSV erfolgreich exportiert.");
+      _showSnack("CSV exportiert:\n${file.path}");
     } catch (e) {
       _showSnack("CSV Export Fehler: $e");
     }
+  }
+
+  // ================= UI HELPERS =================
+
+  void _showSnack(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
+
+  void _openDeviceDetail(Device device) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DeviceDetailScreen(device: device),
+      ),
+    );
   }
 
   // ================= BUILD =================
@@ -204,10 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-
-          // 📊 Statistik
           IconButton(
-            tooltip: "Statistik",
             icon: const Icon(Icons.bar_chart),
             onPressed: () {
               Navigator.push(
@@ -218,15 +216,10 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-
-          // 📄 CSV Export
           IconButton(
-            tooltip: "CSV Export",
             icon: const Icon(Icons.download),
             onPressed: _exportCsv,
           ),
-
-          // ➕ Gerät hinzufügen
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
@@ -242,22 +235,16 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
           ),
-
-          // 📷 QR Scanner
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: _openQRScanner,
           ),
-
-          // 🔄 Synchronisation
           IconButton(
             icon: _isSyncing
                 ? const SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 2),
             )
                 : const Icon(Icons.sync),
             onPressed: _isSyncing ? null : _syncData,
@@ -274,8 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
           itemCount: _devices.length,
-          itemBuilder: (_, i) =>
-              _buildDeviceCard(_devices[i]),
+          itemBuilder: (_, i) => _buildDeviceCard(_devices[i]),
         ),
       ),
     );
@@ -304,30 +290,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildDeviceCard(Device device) {
     return GestureDetector(
       onTap: () => _openDeviceDetail(device),
-      onLongPress: () async {
-        final confirm = await showDialog<bool>(
-          context: context,
-          builder: (dialogContext) => AlertDialog(
-            title: const Text("Löschen?"),
-            content: const Text("Gerät wirklich löschen?"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: const Text("Abbrechen"),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: const Text("Löschen"),
-              ),
-            ],
-          ),
-        );
-
-        if (confirm == true && device.id != null) {
-          await DatabaseHelper.instance.deleteDevice(device.id!);
-          await _loadDevices();
-        }
-      },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(16),

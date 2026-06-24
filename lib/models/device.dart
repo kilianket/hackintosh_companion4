@@ -8,13 +8,13 @@ class Device {
   final String status;
   final String opencoreVersion;
   final String configPlist;
+
   final bool compatible;
-
-  /// Check-In Status
   final bool checkedIn;
-
-  /// Sync-Status
   final bool isDirty;
+
+  /// 📊 WICHTIG: für Statistik (Zeitstrahl)
+  final DateTime createdAt;
 
   Device({
     this.id,
@@ -29,27 +29,10 @@ class Device {
     required this.compatible,
     this.checkedIn = false,
     this.isDirty = false,
+    required this.createdAt,
   });
 
-  /// Flutter → SQLite
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'manufacturer': manufacturer,
-      'cpu': cpu,
-      'gpu': gpu,
-      'wifi': wifi,
-      'status': status,
-      'opencoreVersion': opencoreVersion,
-      'configPlist': configPlist,
-      'compatible': compatible ? 1 : 0,
-      'checkedIn': checkedIn ? 1 : 0,
-      'isDirty': isDirty ? 1 : 0,
-    };
-  }
-
-  /// SQLite → Flutter
+  /// ================= SQLite → Flutter =================
   factory Device.fromMap(Map<String, dynamic> map) {
     return Device(
       id: map['id'] is int ? map['id'] as int : null,
@@ -66,10 +49,36 @@ class Device {
       compatible: _parseBool(map['compatible']),
       checkedIn: _parseBool(map['checkedIn']),
       isDirty: _parseBool(map['isDirty']),
+
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['createdAt'])
+          : DateTime.now(),
     );
   }
 
-  /// Optional: Für Updates praktisch
+  /// ================= Flutter → SQLite =================
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'manufacturer': manufacturer,
+      'cpu': cpu,
+      'gpu': gpu,
+      'wifi': wifi,
+      'status': status,
+      'opencoreVersion': opencoreVersion,
+      'configPlist': configPlist,
+
+      'compatible': compatible ? 1 : 0,
+      'checkedIn': checkedIn ? 1 : 0,
+      'isDirty': isDirty ? 1 : 0,
+
+      /// 📊 Zeitstempel für Statistik
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  /// ================= CopyWith =================
   Device copyWith({
     int? id,
     String? name,
@@ -83,6 +92,7 @@ class Device {
     bool? compatible,
     bool? checkedIn,
     bool? isDirty,
+    DateTime? createdAt,
   }) {
     return Device(
       id: id ?? this.id,
@@ -97,20 +107,18 @@ class Device {
       compatible: compatible ?? this.compatible,
       checkedIn: checkedIn ?? this.checkedIn,
       isDirty: isDirty ?? this.isDirty,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
-  /// Robust gegen 1/0, true/false, Strings und null
+  /// ================= Bool Parser =================
   static bool _parseBool(dynamic value) {
     if (value == null) return false;
     if (value is bool) return value;
     if (value is int) return value == 1;
-
     if (value is String) {
-      final v = value.toLowerCase();
-      return v == '1' || v == 'true';
+      return value.toLowerCase() == 'true' || value == '1';
     }
-
     return false;
   }
 }

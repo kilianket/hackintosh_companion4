@@ -26,7 +26,6 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
 
   Future<void> _saveDevice() async {
     if (_isLoading) return;
-
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
@@ -41,6 +40,11 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
       opencoreVersion: _opencoreVersion.trim(),
       configPlist: _configPlist.trim(),
       compatible: _compatible,
+
+      // ✅ FIX: required field
+      checkedIn: true,
+      isDirty: true,
+      createdAt: DateTime.now(),
     );
 
     setState(() => _isLoading = true);
