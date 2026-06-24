@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-
+import 'dart:io';
+import 'package:csv/csv.dart';
+import 'package:path_provider/path_provider.dart';
+import 'statistics_screen.dart';
 import '../database/database_helper.dart';
 import '../models/device.dart';
 import '../services/sync_service.dart';
@@ -130,6 +133,64 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _exportCsv() async {
+    try {
+      final devices = await DatabaseHelper.instance.getAllDevices();
+
+      if (devices.isEmpty) {
+        _showSnack("Keine Geräte zum Exportieren vorhanden.");
+        return;
+      }
+
+      final rows = <List<dynamic>>[
+        [
+          "ID",
+          "Name",
+          "Hersteller",
+          "CPU",
+          "GPU",
+          "WiFi",
+          "Status",
+          "OpenCore Version",
+          "ConfigPlist",
+          "Kompatibel",
+        ]
+      ];
+
+      for (final d in devices) {
+        rows.add([
+          d.id ?? "",
+          d.name,
+          d.manufacturer,
+          d.cpu,
+          d.gpu,
+          d.wifi,
+          d.status,
+          d.opencoreVersion,
+          d.configPlist,
+          d.compatible ? "Ja" : "Nein",
+        ]);
+      }
+
+      final csvData = const ListToCsvConverter().convert(rows);
+
+      final now = DateTime.now();
+
+      final filename =
+          "hackintosh_export_${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}.csv";
+
+      final directory = await getApplicationDocumentsDirectory();
+
+      final file = File("${directory.path}/$filename");
+
+      await file.writeAsString(csvData);
+
+      _showSnack("CSV erfolgreich exportiert.");
+    } catch (e) {
+      _showSnack("CSV Export Fehler: $e");
+    }
+  }
+
   // ================= BUILD =================
 
   @override
@@ -143,7 +204,29 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          // ➕ ADD
+
+          // 📊 Statistik
+          IconButton(
+            tooltip: "Statistik",
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const StatisticsScreen(),
+                ),
+              );
+            },
+          ),
+
+          // 📄 CSV Export
+          IconButton(
+            tooltip: "CSV Export",
+            icon: const Icon(Icons.download),
+            onPressed: _exportCsv,
+          ),
+
+          // ➕ Gerät hinzufügen
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
@@ -160,19 +243,21 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
 
-          // 📷 QR
+          // 📷 QR Scanner
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: _openQRScanner,
           ),
 
-          // 🔄 SYNC
+          // 🔄 Synchronisation
           IconButton(
             icon: _isSyncing
                 ? const SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+              ),
             )
                 : const Icon(Icons.sync),
             onPressed: _isSyncing ? null : _syncData,
